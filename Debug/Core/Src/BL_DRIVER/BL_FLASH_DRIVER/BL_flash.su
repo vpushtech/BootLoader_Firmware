@@ -1,6 +1,0 @@
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:23:14:Flash_Sector_Erase	56	static
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:57:14:Flash_App_Erase	16	static
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:69:14:Flash_Write_Byte	48	static
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:93:14:Flash_Write_Word	48	static
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:118:14:Flash_Read	32	static
-../Core/Src/BL_DRIVER/BL_FLASH_DRIVER/BL_flash.c:132:22:GetFlashSector	24	static
