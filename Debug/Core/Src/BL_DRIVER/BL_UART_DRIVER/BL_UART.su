@@ -1,6 +1,0 @@
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:20:13:UART_Init	16	static
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:42:13:UART_SendData	32	static
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:73:13:UART_ReceiveDataBlocking	32	static
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:102:13:UART_ReceiveData	32	static
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:130:6:Error_Handler	4	static,ignoring_inline_asm
-../Core/Src/BL_DRIVER/BL_UART_DRIVER/BL_UART.c:138:13:MX_USART2_UART_Init	8	static
