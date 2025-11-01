@@ -7,7 +7,7 @@ import threading
 import os
 import time
 
-CHUNK_SIZE = 256
+CHUNK_SIZE = 8
 app_status = None
 app_size = None
 app_version = None
@@ -30,7 +30,7 @@ def crc32_file(filepath):
     crc = 0xFFFFFFFF
     poly = 0x04C11DB7
     with open(filepath, "rb") as f:
-        while (chunk := f.read(256)):
+        while (chunk := f.read(CHUNK_SIZE)):  # Now reads 8 bytes at a time
             if len(chunk) < CHUNK_SIZE:
                 chunk += bytes([0xFF] * (CHUNK_SIZE - len(chunk)))
             for b in chunk:
@@ -88,7 +88,7 @@ class BootloaderApp(ttk.Window):
         com_menu.grid(row=1, column=1, padx=5, pady=5)
 
         ttk.Label(frame, text="Interface:", font=("Segoe UI", 12, "bold")).grid(row=2, column=0, padx=5, pady=5, sticky='w')
-        interfaces = ["UART"]
+        interfaces = ["UART","CAN"]
         self.interface_var = ttk.StringVar(value=interfaces[0])
         interface_menu = ttk.Combobox(frame, textvariable=self.interface_var, values=interfaces, state='readonly', width=25, bootstyle=INFO)
         interface_menu.grid(row=2, column=1, padx=5, pady=5)
@@ -250,36 +250,79 @@ class BootloaderApp(ttk.Window):
 
     def read_serial_data(self):
         global app_status, app_size, app_version
+        buffer = ""  # Buffer to accumulate incoming data
+        
         while self.read_thread_running:
             if self.ser and self.ser.is_open and self.ser.in_waiting > 0:
                 try:
-                    line = self.ser.readline().decode('utf-8', errors='ignore').strip()
-                    if line:
-                        if line == "OK":
-                            self.ok_event.set()
-                            if self.pending_fwfile and not self.sending:
-                                self.sending = True
-                                self.fw_status.config(text="[Flashing...]", bootstyle="info")
-                                self.update()
-                                threading.Thread(target=self.send_bin_file, args=(self.pending_fwfile, self.update_progress), daemon=True).start()
-                        elif line == "STATUS":
-                            if self.ser.in_waiting >= 1:
-                                status_byte = self.ser.read(1)
-                                app_status = int.from_bytes(status_byte, 'little')
-                                print(status_byte)
-                        elif line == "SIZE":
-                            if self.ser.in_waiting >= 4:
-                                size_bytes = self.ser.read(4)
-                                app_size = int.from_bytes(size_bytes, 'little')
-                                print(size_bytes)
-                        elif line == "VERSION":
-                            if self.ser.in_waiting >= 4:
-                                version_bytes = self.ser.read(4)
-                                version_int = int.from_bytes(version_bytes, 'little')
-                                app_version = self.decode_version(version_int)
-                                print(app_version)
+                    # Read all available data
+                    data = self.ser.read(self.ser.in_waiting)
+                    
+                    # Try to decode as text
+                    try:
+                        text_data = data.decode('utf-8', errors='ignore')
+                        buffer += text_data
+                        
+                        # Process complete lines
+                        while '\n' in buffer:
+                            line, buffer = buffer.split('\n', 1)
+                            line = line.strip().replace('\r', '')  # Remove carriage returns
+                            
+                            if line:
+                                print(f"Received line: '{line}'")  # Debug print
+                                
+                                if line == "OK":
+                                    print("OK received, starting file transfer!")
+                                    self.ok_event.set()
+                                    if self.pending_fwfile and not self.sending:
+                                        self.sending = True
+                                        self.fw_status.config(text="[Flashing...]", bootstyle="info")
+                                        self.update()
+                                        # Small delay to ensure STM32 is ready
+                                        time.sleep(0.2)
+                                        threading.Thread(target=self.send_bin_file, 
+                                                       args=(self.pending_fwfile, self.update_progress), 
+                                                       daemon=True).start()
+                                elif line == "STATUS":
+                                    print("STATUS command received")
+                                    # Read status byte if available
+                                    time.sleep(0.01)  # Small delay to ensure data is available
+                                    if self.ser.in_waiting >= 1:
+                                        status_byte = self.ser.read(1)
+                                        app_status = int.from_bytes(status_byte, 'little')
+                                        print(f"App status: {app_status}")
+                                elif line == "SIZE":
+                                    print("SIZE command received")
+                                    # Read size bytes if available
+                                    time.sleep(0.01)  # Small delay to ensure data is available
+                                    if self.ser.in_waiting >= 4:
+                                        size_bytes = self.ser.read(4)
+                                        app_size = int.from_bytes(size_bytes, 'little')
+                                        print(f"App size: {app_size} bytes")
+                                elif line == "VERSION":
+                                    print("VERSION command received")
+                                    # Read version bytes if available
+                                    time.sleep(0.01)  # Small delay to ensure data is available
+                                    if self.ser.in_waiting >= 4:
+                                        version_bytes = self.ser.read(4)
+                                        version_int = int.from_bytes(version_bytes, 'little')
+                                        app_version = self.decode_version(version_int)
+                                        print(f"App version: {app_version}")
+                                
+                    except UnicodeDecodeError:
+                        # If it's binary data, print hex representation
+                        hex_data = data.hex().upper()
+                        print(f"Received binary data: {hex_data}")
+                        
+                        # Also print as individual bytes for clarity
+                        byte_str = ' '.join([f'{b:02X}' for b in data])
+                        print(f"Bytes: {byte_str}")
+                    
                 except Exception as e:
                     print(f"Error reading serial data: {e}")
+            else:
+                # Small sleep to prevent CPU spinning when no data
+                time.sleep(0.01)
 
     def decode_version(self, version_int: int) -> str:
         major = (version_int >> 24) & 0xFF
@@ -299,6 +342,7 @@ class BootloaderApp(ttk.Window):
 
     def flash_firmware(self):
         if self.sending:
+            messagebox.showwarning("Warning", "File transfer in progress!")
             return
         if not self.ser or not self.ser.is_open:
             messagebox.showerror("Error", "Serial port not connected!")
@@ -309,15 +353,16 @@ class BootloaderApp(ttk.Window):
             return
         
         try:
+            print("Sending update command '1' to device...")
             self.ser.write(b"1")
-            messagebox.showinfo("Sent", "File is Loaded")
+            messagebox.showinfo("Sent", "Update command sent. Waiting for device response...")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send update command: {e}")
             return
             
         self.abort_sending = False # Reset abort flag before starting
         self.pending_fwfile = fwfile
-        self.fw_status.config(text="[Waiting for device]", bootstyle="warning")
+        self.fw_status.config(text="[Waiting for device OK...]", bootstyle="warning")
         self.progress_var.set(0)
         self.bytes_sent_var.set("0 bytes")
         self.bytes_remaining_var.set(f"{os.path.getsize(fwfile):,} bytes")
@@ -325,6 +370,7 @@ class BootloaderApp(ttk.Window):
 
     def firmware_update_command(self):
         if self.sending:
+            messagebox.showwarning("Warning", "File transfer in progress!")
             return
         if not self.ser or not self.ser.is_open:
             messagebox.showerror("Error", "Serial port not connected!")
@@ -337,12 +383,21 @@ class BootloaderApp(ttk.Window):
 
     # --- NEW ABORT METHOD ---
     def abort_flash(self):
-        if self.sending:
-            self.abort_sending = True
-            self.sending = False
-            self.fw_status.config(text="[Aborted]", bootstyle="danger")
-            self.pending_fwfile = None
-            messagebox.showwarning("Abort", "Firmware transfer aborted by user.")
+        if not self.sending and not self.pending_fwfile:
+            messagebox.showinfo("Info", "No file transfer in progress.")
+            return
+            
+        self.abort_sending = True
+        self.sending = False
+        self.pending_fwfile = None
+        self.fw_status.config(text="[Aborted]", bootstyle="danger")
+        messagebox.showwarning("Abort", "Firmware transfer aborted by user.")
+        
+        try:
+            if self.ser and self.ser.is_open:
+                self.ser.write(b"2")  # Send cancel command
+        except Exception as e:
+            print(f"Error sending cancel command: {e}")
 
     def update_progress(self, percent, sent, total):
         self.after(0, self._update_progress_ui, percent, sent, total)
@@ -373,36 +428,68 @@ class BootloaderApp(ttk.Window):
         
         filesize = os.path.getsize(filepath)
         filesize_bytes = filesize.to_bytes(4, 'little')
-        self.ser.write(filesize_bytes)
-        time.sleep(0.05)
-        crc_value = crc32_file(filepath)
         
-        with open(filepath, "rb") as f:
-            sent_bytes = 0
-            while (chunk := f.read(CHUNK_SIZE)) and not self.abort_sending:
-                original_chunk_len = len(chunk)
-                if len(chunk) < CHUNK_SIZE:
-                    chunk += bytes([0xFF] * (CHUNK_SIZE - len(chunk)))
-                
-                try:
-                    self.ser.write(chunk)
-                except serial.SerialException as e:
-                    self.sending = False
-                    self.after(0, lambda: messagebox.showerror("Serial Error", f"Failed to write to port: {e}"))
-                    return
-                
-                sent_bytes += original_chunk_len
-                percent = (sent_bytes / filesize) * 100
-                progress_callback(percent, sent_bytes, filesize)
-                time.sleep(1)
+        print(f"Sending filesize: {filesize} bytes ({filesize_bytes.hex().upper()})")
         
-        if not self.abort_sending:
-            progress_callback(100, filesize, filesize)
-            crc_bytes = crc_value.to_bytes(4, 'little')
-            self.ser.write(crc_bytes)
+        try:
+            # Send file size
+            self.ser.write(filesize_bytes)
+            time.sleep(0.1)  # Give time for the STM32 to process
+            
+            # Calculate CRC
+            crc_value = crc32_file(filepath)
+            print(f"File CRC32: 0x{crc_value:08X}")
+
+            CHUNK_SIZE = 8  # Send 8 bytes at a time
+
+            with open(filepath, "rb") as f:
+                sent_bytes = 0
+                chunk_count = 0
+                while (chunk := f.read(CHUNK_SIZE)) and not self.abort_sending:
+                    original_chunk_len = len(chunk)
+                    original_chunk = chunk  # Store original for display
+                    
+                    if len(chunk) < CHUNK_SIZE:
+                        chunk = chunk + bytes([0xFF] * (CHUNK_SIZE - len(chunk)))
+                    
+                    try:
+                        self.ser.write(chunk)
+                    except serial.SerialException as e:
+                        self.sending = False
+                        self.after(0, lambda: messagebox.showerror("Serial Error", f"Failed to write to port: {e}"))
+                        return
+                    
+                    # Print sent data
+                    print(f"Chunk {chunk_count}: {original_chunk.hex().upper()} ", end="")
+                    if original_chunk_len < CHUNK_SIZE:
+                        print(f"(padded to {chunk.hex().upper()})")
+                    else:
+                        print()
+                    
+                    sent_bytes += original_chunk_len
+                    percent = (sent_bytes / filesize) * 100
+                    progress_callback(percent, sent_bytes, filesize)
+                    chunk_count += 1
+                    time.sleep(0.05)  # Small delay between chunks
+            
+            if not self.abort_sending:
+                progress_callback(100, filesize, filesize)
+                crc_bytes = crc_value.to_bytes(4, 'little')
+                time.sleep(0.5)  # Wait a bit before sending CRC
+                print(f"Sending CRC: {crc_bytes.hex().upper()}")
+                self.ser.write(crc_bytes)
+                print("File transfer completed successfully!")
+                self.after(0, lambda: messagebox.showinfo("Success", "Firmware update completed successfully!"))
+            else:
+                print("File transfer aborted by user!")
+                self.after(0, lambda: messagebox.showwarning("Aborted", "Firmware transfer was aborted."))
+            
+        except Exception as e:
+            print(f"Error during file transfer: {e}")
+            self.after(0, lambda: messagebox.showerror("Error", f"File transfer failed: {e}"))
         
-        # Reset sending flag, handled by abort_flash or _update_progress_ui
         self.sending = False
+        self.pending_fwfile = None
 
 if __name__ == "__main__":
     app = BootloaderApp()
