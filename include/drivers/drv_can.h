@@ -50,7 +50,7 @@ typedef struct {
     U8 DRV_Data_arru8[8];
 } DRV_CanFrame_St_t;
 
-#define CAN_TIMEOUT				3000
+#define CAN_TIMEOUT				1000
 
 /* ==================== INITIALIZATION/CONFIGURATION ==================== */
 DRV_CanStatus_En DRV_CAN_Init_gen(DRV_CanInstance_En instance_arg);

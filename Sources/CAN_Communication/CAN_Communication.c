@@ -36,7 +36,7 @@ void CAN_ID_0x1A0_mv(char *Data, uint32_t length)
 	DRV_CAN_Transmit_gen(DRV_CAN_INSTANCE_1, CAN_DataFrame_St[CAN_ID_0x1A0].CAN_BufferID_En,  &CAN_DataFrame_St[CAN_ID_0x1A0].DRV_CanFrame_St);
 }
 
-void CAN_Rx_0x1B0_mv(uint8_t *buff)
+DRV_CanStatus_En CAN_Rx_0x1B0_mv(uint8_t *buff)
 {
 	DRV_CanStatus_En status = DRV_CAN_ReceiveBlocking_gen(DRV_CAN_INSTANCE_1, CAN_Buffer_Idx_2, &CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St);
 	if(status == DRV_CAN_STATUS_SUCCESS)
@@ -46,7 +46,7 @@ void CAN_Rx_0x1B0_mv(uint8_t *buff)
 			buff[i] = CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St.DRV_Data_arru8[i];
 		}
 	}
-
+	return status;
 }
 
 void CAN_Callback(U8 instance,flexcan_event_type_t eventType,U32 bufferIdx,flexcan_state_t *flexcanState)
@@ -55,23 +55,5 @@ void CAN_Callback(U8 instance,flexcan_event_type_t eventType,U32 bufferIdx,flexc
 	(void)flexcanState;
 	(void)eventType;
 	(void)bufferIdx;
-	/*switch(eventType)
-	{
-		case FLEXCAN_EVENT_RX_COMPLETE:
-		{
-			switch(bufferIdx)
-			{
-				case CAN_Buffer_Idx_2:
-				{
-					DRV_CAN_Receive_gen(DRV_CAN_INSTANCE_1, CAN_Buffer_Idx_2, &CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St);
-					for(uint32_t i=0; i<8; i++)
-					{
-						rx_buff[i] = CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St.DRV_Data_arru8[i];
-					}
-				}
-			}
-			break;
-		}
-		default :{}
-	}*/
+
 }

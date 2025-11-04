@@ -3,7 +3,7 @@
 #include "lpuart_driver.h"
 #include "lpuart1.h"
 /* ==================== DEFINES ==================== */
-#define TIMEOUT_MS             3000U
+#define TIMEOUT_MS             1000U
 #define DEFAULT_IRQ_PRIORITY   3U
 
 /* ==================== STATIC VARIABLES ==================== */
@@ -11,18 +11,13 @@ static const uint32_t DRV_UartInstances_arr[DRV_UART_MAX_INSTANCE] = {INST_LPUAR
 static lpuart_state_t DRV_lpuartState[DRV_UART_MAX_INSTANCE];
 
 /* ==================== STATIC FUNCTIONS ==================== */
-//void rxCallback(void *driverState, uart_event_t event, void *userData)
-//{
-//    /* Unused parameters */
-//    (void)driverState;
-//    (void)userData;
-//
-//    /* Check the event type */
-//    if (event == UART_EVENT_RX_FULL)
-//    {
-//
-//    }
-//}
+
+/*void rxCallback(void *driverState, uart_event_t event, void *userData)
+{
+    (void)driverState;
+    (void)userData;
+}*/
+
 
 DRV_Uart_Status DRV_UART_Init(DRV_UART_Instance_En uart_instance)
 {
@@ -36,7 +31,6 @@ DRV_Uart_Status DRV_UART_Init(DRV_UART_Instance_En uart_instance)
     {
         //LPUART_DRV_InstallRxCallback(INST_LPUART1, rxCallback, NULL);
     }
-
     return DRV_UART_STATUS_ERROR;
 }
 

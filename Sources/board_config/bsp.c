@@ -16,6 +16,7 @@ extern flash_ssd_config_t flashSSDConfig;
 uint32_t bytes_written = 0;
 uint8_t cmd;
 uint8_t rx_buff[8] = {0};
+uint8_t uart_rxBuff[8] = {0};
 
 DRV_TimerConfig_St_t DRV_TimerConfigTable_gst[MAX_TIMER_PIN]={
 		{  DRV_TIMER0,DRV_CHANNEL_0},
@@ -25,29 +26,20 @@ static void BSP_HardwareInit(void)
 {
     CLOCK_DRV_Init(&clockMan1_InitConfig0);
     PINS_DRV_Init(NUM_OF_CONFIGURED_PINS, g_pin_mux_InitConfigArr);
-    DRV_CanStatus_En status = DRV_CAN_Init_gen(DRV_CAN_INSTANCE_1);
+    DRV_CAN_Init_gen(DRV_CAN_INSTANCE_1);
     DRV_Timer_Init_gv(LPTI_TIMER0_CH0);
-    if(status != DRV_CAN_STATUS_SUCCESS)
-    {
-    	while(1);
-    }
     Flash_init();
-    //DRV_UART_Init(DRV_UART_INSTANCE_1);
-}
-
-void can_RxConfig(void)
-{
-	DRV_CAN_ConfigRxBuffer_gen(DRV_CAN_INSTANCE_1, CAN_Buffer_Idx_2, &CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St, 0x1B0);
-	//DRV_CAN_Receive_gen(DRV_CAN_INSTANCE_1, CAN_Buffer_Idx_2, &CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St);
+    DRV_UART_Init(DRV_UART_INSTANCE_1);
 }
 
 void BSP_Init(void)
 {
     BSP_HardwareInit();
-    BSP_DRV_Config_gv();
-
+    uart_RxConfig();
     can_RxConfig();
+
     //Flash_Sector_Erase((uint32_t)APP_START_ADDRESS,(uint32_t)APP_SIZE);
+
     if(check_boot_flag() != BOOT_FLAG_VALUE && Read_app_status() == APP_STATUS_OK)
 	{
     	JumpToUserApp();
@@ -59,6 +51,12 @@ void BSP_Init(void)
 
 void JumpToUserApp(void)
 {
+	DRV_UART_Deinit(DRV_UART_INSTANCE_1);
+	DRV_CAN_Deinit_gen(DRV_CAN_INSTANCE_1);
+	DRV_Timer_DeInit_gv(LPTI_TIMER0_CH0);
+
+	INT_SYS_DisableIRQGlobal();
+
 	uint32_t mspValue = *(volatile uint32_t *)APP_START_ADDRESS;
 	uint32_t reset_handler = *(volatile uint32_t *)(APP_START_ADDRESS + 4U);
 
@@ -72,23 +70,57 @@ void JumpToUserApp(void)
 
 void JumpToBootloader(void)
 {
-	uint32_t Py_CRC=0;
+	uint8_t cmd;
 	uint8_t rxbuf[8] = {0};
 	while(1)
 	{
-		//DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,&cmd,sizeof(cmd));
-		CAN_Rx_0x1B0_mv((uint8_t *)&rxbuf);
-		if(rxbuf[0] == FLASH_WRITE_CMD)
+		cmd = uart_rxBuff[0];
+		if(cmd == UART_COMMAND)
+		{
+			can_deinit();
+			DRV_UART_Deinit(DRV_UART_INSTANCE_1);
+			DRV_UART_Init(DRV_UART_INSTANCE_1);
+			UART_Comm();
+			break;
+		}
+		else if(CAN_Rx_0x1B0_mv((uint8_t *)&rxbuf) == DRV_CAN_STATUS_SUCCESS)
+		{
+			if(rxbuf[0] == CAN_COMMAND)
+			{
+				uart_deinit();
+				CAN_Comm();
+				break;
+			}
+		}
+	}
+}
+
+void can_deinit(void)
+{
+	DRV_CAN_Deinit_gen(DRV_CAN_INSTANCE_1);
+}
+
+void uart_deinit(void)
+{
+	DRV_UART_Deinit(DRV_UART_INSTANCE_1);
+}
+
+void UART_Comm(void)
+{
+	uint8_t cmd;
+	uint32_t Py_CRC = 5;
+	while(1)
+	{
+		DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,&cmd,sizeof(cmd));
+		if(cmd == FLASH_WRITE_CMD)
 		{
 			Flash_Sector_Erase((uint32_t)APP_START_ADDRESS,(uint32_t)APP_SIZE);
 			update_data(0x00);
-			if(BL_Handle_FlashWrite() != FLASH_OK)
+			if(UART_FlashWrite() != DRV_UART_STATUS_SUCCESS)
 			{
 				SystemReset();
 			}
-			//DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,(uint8_t *)&Py_CRC, sizeof(Py_CRC));
-			CAN_Rx_0x1B0_mv((uint8_t *)&rxbuf);
-			Py_CRC = rxbuf[0] |(rxbuf[1] << 8) |(rxbuf[2] << 16) |(rxbuf[3] << 24);
+			DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,(uint8_t *)&Py_CRC, sizeof(Py_CRC));
 			uint32_t crc = crc32_flash();
 			if(crc == Py_CRC)
 			{
@@ -101,38 +133,86 @@ void JumpToBootloader(void)
 			set_boot_flag();
 			SystemReset();
 		}
-		else
+	}
+}
+
+void CAN_Comm(void)
+{
+	uint32_t Py_CRC = 5;
+	uint8_t rxbuf[8] = {0};
+	while(1)
+	{
+		CAN_Rx_0x1B0_mv((uint8_t *)&rxbuf);
+		if(rxbuf[0] == FLASH_WRITE_CMD)
 		{
+			Flash_Sector_Erase((uint32_t)APP_START_ADDRESS,(uint32_t)APP_SIZE);
+			update_data(0x00);
+			if(CAN_FlashWrite() != DRV_CAN_STATUS_SUCCESS)
+			{
+				SystemReset();
+			}
+			CAN_Rx_0x1B0_mv((uint8_t *)&rxbuf);
+			Py_CRC = rxbuf[0] |(rxbuf[1] << 8) |(rxbuf[2] << 16) |(rxbuf[3] << 24);
+			uint32_t crc = crc32_flash();
+			if(crc == Py_CRC)
+			{
+				update_data(0x01);
+				SystemReset();
+			}
+		}
+		else if(rxbuf[0] == CANCEL_FLASH_WRITE)
+		{
+			set_boot_flag();
 			SystemReset();
 		}
 	}
 }
 
-flash_status BL_Handle_FlashWrite(void)
+DRV_Uart_Status UART_FlashWrite(void)
 {
 	uint32_t flash_addr   = APP_START_ADDRESS;
 	const uint32_t chunk  = 8;
 	uint8_t recSize[8] = {0};
 	bytes_written = 0;
 
-	//DRV_UART_SendDataBlocking(DRV_UART_INSTANCE_1,(uint8_t*)"OK\n", 3);
+	DRV_UART_SendDataBlocking(DRV_UART_INSTANCE_1,(uint8_t*)"OK\n", 3);
+	DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,(uint8_t *)&recSize, 4);
+	uint32_t filesize = recSize[0] |(recSize[1] << 8) |(recSize[2] << 16) |(recSize[3] << 24);
+
+	while (bytes_written < filesize)
+	{
+		if(DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,(uint8_t *)&rx_buff, chunk) == DRV_UART_STATUS_ERROR)
+		{
+			return DRV_UART_STATUS_ERROR;
+		}
+		Flash_Write_Byte(flash_addr, rx_buff, chunk);
+		flash_addr     += chunk;
+		bytes_written  += chunk;
+	}
+	return DRV_UART_STATUS_SUCCESS;
+}
+
+DRV_CanStatus_En CAN_FlashWrite(void)
+{
+	uint32_t flash_addr   = APP_START_ADDRESS;
+	const uint32_t chunk  = 8;
+	uint8_t recSize[8] = {0};
+	bytes_written = 0;
+
 	DRV_Timer_Delay_gv(LPTI_TIMER0_CH0,DRV_DELAY_UNITS_MILLISECOND,100);
 	CAN_ID_0x1A0_mv("OK\n",3);
-	//DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,recSize, 4);
 	CAN_Rx_0x1B0_mv((uint8_t *)&recSize);
 	uint32_t filesize = recSize[0] |(recSize[1] << 8) |(recSize[2] << 16) |(recSize[3] << 24);
 
 	while (bytes_written < filesize)
 	{
-		if (flash_addr + chunk > APP_END_ADDRESS)
-			break;
-		//DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,rx_buff, chunk);
-		CAN_Rx_0x1B0_mv((uint8_t *)&rx_buff);
+		if(CAN_Rx_0x1B0_mv((uint8_t *)&rx_buff) == DRV_CAN_STATUS_ERROR)
+			return DRV_CAN_STATUS_ERROR;
 		Flash_Write_Byte(flash_addr, rx_buff, chunk);
 		flash_addr     += chunk;
 		bytes_written  += chunk;
 	}
-	return FLASH_OK;
+	return DRV_CAN_STATUS_SUCCESS;
 }
 
 uint32_t crc32_flash(void)
@@ -205,54 +285,21 @@ void SystemReset(void)
     while(1);
 }
 
-void delay(uint32_t cycles)
+void can_RxConfig(void)
 {
-    while(cycles--);
+	DRV_CAN_ConfigRxBuffer_gen(DRV_CAN_INSTANCE_1, CAN_Buffer_Idx_2, &CAN_DataFrame_St[CAN_ID_0x1B0].DRV_CanFrame_St, 0x1B0);
+}
+
+void uart_RxConfig(void)
+{
+	DRV_UART_SetRxBuffer(DRV_UART_INSTANCE_1,(uint8_t *)&uart_rxBuff,8);
+	DRV_UART_ReceiveData(DRV_UART_INSTANCE_1,(uint8_t *)&uart_rxBuff,8);
 }
 
 void BSP_DRV_Config_gv(void)
 {
-   //DRV_NVIC_IRQConfig_gen(NVIC_FTFC_IRQ,0);
-   //DRV_NVIC_IRQConfig_gen(NVIC_LPUART1_IRQ,5);
-   //DRV_Timer_InterruptConfig_gst(LPTI_TIMER0_CH0, NVIC_LPIT0_CH0_IRQ, 2, 1, DRV_DELAY_UNITS_MILLISECOND);
-   //DRV_Timer_Start_gv(NVIC_LPIT0_CH0_IRQ);
+   /*DRV_NVIC_IRQConfig_gen(NVIC_FTFC_IRQ,0);
+   DRV_NVIC_IRQConfig_gen(NVIC_LPUART1_IRQ,5);
+   DRV_Timer_InterruptConfig_gst(LPTI_TIMER0_CH0, NVIC_LPIT0_CH0_IRQ, 2, 1, DRV_DELAY_UNITS_MILLISECOND);
+   DRV_Timer_Start_gv(NVIC_LPIT0_CH0_IRQ);*/
 }
-
-/*flash_status JumpToBootloader(void)
-{
-    uint32_t flash_addr   = APP_START_ADDRESS;
-    const uint32_t chunk  = 8;
-    uint8_t  recSize[4]   = {0};
-    bytes_written = 0;
-    uint8_t rx_buff[8];
-    uint32_t Py_CRC=0;
-
-    Flash_Sector_Erase((uint32_t)APP_START_ADDRESS,(uint32_t)APP_SIZE);
-    DRV_UART_SendDataBlocking(DRV_UART_INSTANCE_1,(uint8_t*)"OK\r\n", 4);
-    DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,recSize, 4);
-    uint32_t filesize = recSize[0] |(recSize[1] << 8) |(recSize[2] << 16) |(recSize[3] << 24);
-
-    while (bytes_written < filesize)
-    {
-		uint32_t remaining     = filesize - bytes_written;
-		uint32_t current_chunk = (remaining < chunk) ? remaining : chunk;
-
-		if (flash_addr + current_chunk > APP_END_ADDRESS)
-			break;
-		DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,rx_buff, current_chunk);
-		Flash_Write_Byte(flash_addr, rx_buff, current_chunk);
-		flash_addr     += current_chunk;
-		bytes_written  += current_chunk;
-    }
-    flash_status status3 = DRV_UART_ReceiveDataBlocking(DRV_UART_INSTANCE_1,(uint8_t *)&Py_CRC, sizeof(Py_CRC));
-    if(status3 != FLASH_OK)
-	{
-		return FLASH_ERROR;
-	}
-    uint32_t crc = crc32_flash();
-	if(crc == Py_CRC)
-	{
-		while(1);
-	}
-    return FLASH_OK;
-}*/

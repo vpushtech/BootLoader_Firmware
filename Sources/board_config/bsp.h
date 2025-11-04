@@ -23,9 +23,11 @@ typedef enum {
 #define APP_STATUS_ADDRESS	 		0x0007F008
 #define APP_SIZE_ADDRESS	 		0x0007F010
 #define APP_VERSION_ADDRESS			0x0007F018
-#define FLASH_WRITE_CMD				49
 #define APP_STATUS_OK				1
-#define CANCEL_FLASH_WRITE				50
+#define UART_COMMAND 				49
+#define CAN_COMMAND					50
+#define FLASH_WRITE_CMD				51
+#define CANCEL_FLASH_WRITE			52
 
 /* ==================== EXTERN VARIABLES ==================== */
 /* Configuration Tables */
@@ -35,14 +37,18 @@ extern DRV_TimerConfig_St_t DRV_TimerConfigTable_gst[MAX_TIMER_PIN];
 /* CAN Frame Buffers */
 /* ==================== FUNCTION DECLARATIONS ==================== */
 
-void can_testing(void);
 /* Board Support Package Initialization */
 extern void BSP_Init(void);
 void BSP_DRV_Config_gv(void);
 
 void JumpToUserApp(void);
 void JumpToBootloader(void);
-flash_status BL_Handle_FlashWrite(void);
+void can_deinit(void);
+void uart_deinit(void);
+void UART_Comm(void);
+void CAN_Comm(void);
+DRV_Uart_Status UART_FlashWrite(void);
+DRV_CanStatus_En CAN_FlashWrite(void);
 uint32_t crc32_flash(void);
 uint32_t crc32_calculate(uint8_t* data, uint32_t length);
 void set_boot_flag(void);
@@ -50,7 +56,8 @@ uint32_t check_boot_flag(void);
 uint8_t Read_app_status(void);
 flash_status update_data(uint8_t app_status);
 void SystemReset(void);
-void delay(uint32_t cycles);
+void can_RxConfig(void);
+void uart_RxConfig(void);
 
 extern void BSP_TimerDelay(U32 delay_argu32, DRV_TimerDelayUnit_En unit_argen);
 

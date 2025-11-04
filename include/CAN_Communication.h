@@ -29,6 +29,6 @@ typedef struct
 
 extern CAN_DataFrame_St_t CAN_DataFrame_St[CAN_TOTAL_ID];
 void CAN_Callback(U8  instance,flexcan_event_type_t eventType,U32 bufferIdx,flexcan_state_t *flexcanState);
-void CAN_Rx_0x1B0_mv(uint8_t *buff);
+DRV_CanStatus_En CAN_Rx_0x1B0_mv(uint8_t *buff);
 void  CAN_ID_0x1A0_mv(char *Data, uint32_t length);
 #endif /* CAN_COMMUNICATION_CAN_COMMUNICATION_H_ */
