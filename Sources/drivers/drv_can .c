@@ -29,7 +29,7 @@ static const U8 DRV_CanInstances_arrst[DRV_CAN_MAX_INSTANCE] = {
 static const flexcan_user_config_t* DRV_CanConfig_arrst[DRV_CAN_MAX_INSTANCE] = {
     &canCom1_InitConfig0
 };
-/* ==================== GLOBLE VARIABLES ==================== */
+/* ==================== GLOBAL VARIABLES ==================== */
 static flexcan_msgbuff_t DRV_RecvBuff[10] = {0};
 
 flexcan_state_t DRV_flexcanState[DRV_CAN_MAX_INSTANCE];

@@ -130,7 +130,7 @@
       <File Name="SDK/platform/drivers/src/lpit/lpit_driver.c" FileDate="2025-10-17, 18:13:10" FileAge="1760704990457" FileType="1048576" CompNumb="5" />
       <File Name="SDK/platform/drivers/inc/flexcan_driver.h" FileDate="2025-10-17, 18:13:10" FileAge="1760704990593" FileType="1048576" CompNumb="64" />
       <File Name="SDK/platform/devices/common/s32_core_cm4.h" FileDate="2025-10-17, 18:13:10" FileAge="1760704990641" FileType="1048576" CompNumb="1" />
-      <File Name="Sources/main.c" FileDate="2025-10-26, 14:29:16" FileAge="1761469156327" FileType="128" />
+      <File Name="Sources/main.c" FileDate="2025-11-06, 16:15:14" FileAge="1762425914263" FileType="128" />
       <File Name="SDK/platform/drivers/src/lpuart/lpuart_driver.c" FileDate="2025-10-18, 12:55:50" FileAge="1760772350898" FileType="1048576" CompNumb="69" />
       <File Name="SDK/platform/drivers/src/wdog/wdog_driver.c" FileDate="2025-10-17, 18:13:10" FileAge="1760704990677" FileType="1048576" CompNumb="1" />
       <File Name="SDK/platform/pal/inc/adc_pal.h" FileDate="1970-01-01, 05:29:59" FileAge="-1" FileType="1048576" />
@@ -148,5 +148,5 @@
       <File Name="SDK/rtos/osif/osif.h" FileDate="2025-10-17, 18:13:10" FileAge="1760704990492" FileType="1048576" CompNumb="27" />
     </GeneratedByPE>
   </GeneratedFilesList>
-  <CodeGenReference>460</CodeGenReference>
+  <CodeGenReference>479</CodeGenReference>
 </CodeGenerationInfo>

@@ -4,45 +4,58 @@
 #include "lpuart1.h"
 /* ==================== DEFINES ==================== */
 #define TIMEOUT_MS             1000U
-#define DEFAULT_IRQ_PRIORITY   3U
 
 /* ==================== STATIC VARIABLES ==================== */
-static const uint32_t DRV_UartInstances_arr[DRV_UART_MAX_INSTANCE] = {INST_LPUART1};
-static lpuart_state_t DRV_lpuartState[DRV_UART_MAX_INSTANCE];
+static const uint32_t uartInstances_arrst[DRV_UART_MAX_INSTANCE] = {INST_LPUART1};
+static lpuart_state_t uartConfig_arrst[DRV_UART_MAX_INSTANCE];
 
 /* ==================== STATIC FUNCTIONS ==================== */
 
-/*void rxCallback(void *driverState, uart_event_t event, void *userData)
-{
-    (void)driverState;
-    (void)userData;
-}*/
-
-
-DRV_Uart_Status DRV_UART_Init(DRV_UART_Instance_En uart_instance)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_Init
+*   Description   : Initializes UART controller for specified instance
+*   Parameters    : uart_instance - UART instance to initialize
+*   Return Value  : DRV_Uart_Status - Status of initialization
+*                   (DRV_UART_STATUS_SUCCESS/DRV_UART_STATUS_ERROR)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_Init(DRV_UART_Instance_ten uartPinIdx_argu8)
 {
     status_t status;
-    if (uart_instance >= DRV_UART_MAX_INSTANCE)
+    if (uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE)
     {
         return DRV_UART_STATUS_ERROR;
     }
-    status = LPUART_DRV_Init(DRV_UartInstances_arr[uart_instance],&DRV_lpuartState[uart_instance],&lpuart1_InitConfig0);
-    if( STATUS_SUCCESS==status)
+
+    status = LPUART_DRV_Init(uartInstances_arrst[uartPinIdx_argu8],&uartConfig_arrst[uartPinIdx_argu8],&lpuart1_InitConfig0);
+    if( STATUS_SUCCESS == status)
     {
-        //LPUART_DRV_InstallRxCallback(INST_LPUART1, rxCallback, NULL);
+    	return DRV_UART_STATUS_SUCCESS;
     }
     return DRV_UART_STATUS_ERROR;
 }
 
-DRV_Uart_Status DRV_UART_SendDataBlocking(DRV_UART_Instance_En uart_instance,const uint8_t *sendData,uint32_t length)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_SendDataBlocking
+*   Description   : Transmits data via UART in blocking mode with timeout
+*   Parameters    : uart_instance - UART instance to use
+*                   sendData - Pointer to data buffer to transmit
+*                   length - Number of bytes to transmit
+*   Return Value  : DRV_Uart_Status - Status of transmission
+*                   (SUCCESS/ERROR/BUSY/TIMEOUT)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_SendDataBlocking(DRV_UART_Instance_ten uartPinIdx_argu8,const uint8_t *data_argptru8,uint32_t size_argu32)
 {
     status_t status;
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (sendData == NULL) || (length == 0U))
+    if ((uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE) || (data_argptru8 == NULL) || (size_argu32 == 0U))
     {
         return DRV_UART_STATUS_ERROR;
     }
 
-    status = LPUART_DRV_SendDataBlocking(DRV_UartInstances_arr[uart_instance],sendData,length,TIMEOUT_MS);
+    status = LPUART_DRV_SendDataBlocking(uartInstances_arrst[uartPinIdx_argu8],data_argptru8,size_argu32,TIMEOUT_MS);
     if (status == STATUS_SUCCESS)
     {
         return DRV_UART_STATUS_SUCCESS;
@@ -58,15 +71,26 @@ DRV_Uart_Status DRV_UART_SendDataBlocking(DRV_UART_Instance_En uart_instance,con
     return DRV_UART_STATUS_ERROR;
 }
 
-DRV_Uart_Status DRV_UART_SendData(DRV_UART_Instance_En uart_instance,const uint8_t *sendData,uint32_t length)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_SendData
+*   Description   : Transmits data via UART in non-blocking mode
+*   Parameters    : uart_instance - UART instance to use
+*                   sendData - Pointer to data buffer to transmit
+*                   length - Number of bytes to transmit
+*   Return Value  : DRV_Uart_Status - Status of transmission
+*                   (SUCCESS/ERROR/BUSY)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_SendData(DRV_UART_Instance_ten uartPinIdx_argu8,const uint8_t *data_argptru8,uint32_t size_argu32)
 {
     status_t status;
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (sendData == NULL) || (length == 0U))
+    if ((uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE) || (data_argptru8 == NULL) || (size_argu32 == 0U))
     {
         return DRV_UART_STATUS_ERROR;
     }
 
-    status = LPUART_DRV_SendData(DRV_UartInstances_arr[uart_instance],sendData,length);
+    status = LPUART_DRV_SendData(uartInstances_arrst[uartPinIdx_argu8],data_argptru8,size_argu32);
     if (status == STATUS_SUCCESS)
     {
         return DRV_UART_STATUS_SUCCESS;
@@ -79,15 +103,26 @@ DRV_Uart_Status DRV_UART_SendData(DRV_UART_Instance_En uart_instance,const uint8
     return DRV_UART_STATUS_ERROR;
 }
 
-DRV_Uart_Status DRV_UART_ReceiveDataBlocking(DRV_UART_Instance_En uart_instance,uint8_t *recdata,uint32_t length)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_ReceiveDataBlocking
+*   Description   : Receives data via UART in blocking mode with timeout
+*   Parameters    : uart_instance - UART instance to use
+*                   recdata - Pointer to buffer for received data
+*                   length - Number of bytes to receive
+*   Return Value  : DRV_Uart_Status - Status of reception
+*                   (SUCCESS/ERROR/BUSY/TIMEOUT)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_ReceiveDataBlocking(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *data_argptru8,uint32_t size_argu32)
 {
     status_t status;
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (recdata == NULL) || (length == 0U))
+    if ((uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE) || (data_argptru8 == NULL) || (size_argu32 == 0U))
     {
         return DRV_UART_STATUS_ERROR;
     }
 
-    status = LPUART_DRV_ReceiveDataBlocking(DRV_UartInstances_arr[uart_instance],recdata,length,TIMEOUT_MS);
+    status = LPUART_DRV_ReceiveDataBlocking(uartInstances_arrst[uartPinIdx_argu8],data_argptru8,size_argu32,TIMEOUT_MS);
     if (status == STATUS_SUCCESS)
     {
         return DRV_UART_STATUS_SUCCESS;
@@ -104,14 +139,25 @@ DRV_Uart_Status DRV_UART_ReceiveDataBlocking(DRV_UART_Instance_En uart_instance,
     return DRV_UART_STATUS_ERROR;
 }
 
-DRV_Uart_Status DRV_UART_ReceiveData(DRV_UART_Instance_En uart_instance,uint8_t *recdata,uint32_t length)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_ReceiveData
+*   Description   : Receives data via UART in non-blocking mode
+*   Parameters    : uart_instance - UART instance to use
+*                   recdata - Pointer to buffer for received data
+*                   length - Number of bytes to receive
+*   Return Value  : DRV_Uart_Status - Status of reception
+*                   (SUCCESS/ERROR/BUSY)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_ReceiveData(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *data_argptru8,uint32_t size_argu32)
 {
     status_t status;
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (recdata == NULL) || (length == 0U))
+    if ((uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE) || (data_argptru8 == NULL) || (size_argu32 == 0U))
     {
         return DRV_UART_STATUS_ERROR;
     }
-    status = LPUART_DRV_ReceiveData(DRV_UartInstances_arr[uart_instance],recdata,length);
+    status = LPUART_DRV_ReceiveData(uartInstances_arrst[uartPinIdx_argu8],data_argptru8,size_argu32);
 
     if (status == STATUS_SUCCESS)
     {
@@ -124,76 +170,47 @@ DRV_Uart_Status DRV_UART_ReceiveData(DRV_UART_Instance_En uart_instance,uint8_t 
     return DRV_UART_STATUS_ERROR;
 }
 
-DRV_Uart_Status DRV_UART_GetTransmitStatus(DRV_UART_Instance_En uart_instance,uint32_t *bytesRemaining)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_SetRxBuffer
+*   Description   : Sets the receive buffer for interrupt-driven reception
+*   Parameters    : uart_instance - UART instance to configure
+*                   rxBuffer - Pointer to receive buffer
+*                   rxSize - Size of receive buffer in bytes
+*   Return Value  : DRV_Uart_Status - Status of buffer configuration
+*                   (SUCCESS/ERROR)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_SetRxBuffer(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *rxBuffer,uint32_t size_argu32)
 {
-    status_t status;
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (bytesRemaining == NULL))
+    if ((uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE) || (rxBuffer == NULL) || (size_argu32 == 0U))
     {
         return DRV_UART_STATUS_ERROR;
     }
-
-    status = LPUART_DRV_GetTransmitStatus(DRV_UartInstances_arr[uart_instance],bytesRemaining);
-
-    if (status == STATUS_SUCCESS)
-    {
-        return DRV_UART_STATUS_SUCCESS;
-    }
-    else if (status == STATUS_BUSY)
-    {
-        return DRV_UART_STATUS_BUSY;
-    }
-
-    return DRV_UART_STATUS_ERROR;
-}
-
-DRV_Uart_Status DRV_UART_GetReceiveStatus(DRV_UART_Instance_En uart_instance,uint32_t *bytesRemaining)
-{
-    status_t status;
-
-    /* Validate parameters */
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (bytesRemaining == NULL))
-    {
-        return DRV_UART_STATUS_ERROR;
-    }
-
-    status = LPUART_DRV_GetReceiveStatus(DRV_UartInstances_arr[uart_instance],
-                                       bytesRemaining);
-
-    if (status == STATUS_SUCCESS)
-    {
-        return DRV_UART_STATUS_SUCCESS;
-    }
-    else if (status == STATUS_BUSY)
-    {
-        return DRV_UART_STATUS_BUSY;
-    }
-
-    return DRV_UART_STATUS_ERROR;
-}
-
-DRV_Uart_Status DRV_UART_SetRxBuffer(DRV_UART_Instance_En uart_instance,uint8_t *rxBuffer,uint32_t rxSize)
-{
-    if ((uart_instance >= DRV_UART_MAX_INSTANCE) || (rxBuffer == NULL) || (rxSize == 0U))
-    {
-        return DRV_UART_STATUS_ERROR;
-    }
-    LPUART_DRV_SetRxBuffer(DRV_UartInstances_arr[uart_instance], rxBuffer, rxSize);
+    LPUART_DRV_SetRxBuffer(uartInstances_arrst[uartPinIdx_argu8], rxBuffer, size_argu32);
     return DRV_UART_STATUS_SUCCESS;
 }
 
-
-DRV_Uart_Status DRV_UART_Deinit(DRV_UART_Instance_En uart_instance)
+/* -----------------------------------------------------------------------------
+*  FUNCTION DESCRIPTION
+*  -----------------------------------------------------------------------------
+*   Function Name : DRV_UART_Deinit
+*   Description   : Deinitializes UART controller for specified instance
+*   Parameters    : uart_instance - UART instance to deinitialize
+*   Return Value  : DRV_Uart_Status - Status of deinitialization
+*                   (SUCCESS/ERROR)
+*  --------------------------------------------------------------------------- */
+DRV_Uart_Status_ten DRV_UART_Deinit(DRV_UART_Instance_ten uartPinIdx_argu8)
 {
     status_t status;
 
     /* Validate instance */
-    if (uart_instance >= DRV_UART_MAX_INSTANCE)
+    if (uartPinIdx_argu8 >= DRV_UART_MAX_INSTANCE)
     {
         return DRV_UART_STATUS_ERROR;
     }
 
-    status = LPUART_DRV_Deinit(DRV_UartInstances_arr[uart_instance]);
+    status = LPUART_DRV_Deinit(uartInstances_arrst[uartPinIdx_argu8]);
 
     return (status == STATUS_SUCCESS) ? DRV_UART_STATUS_SUCCESS : DRV_UART_STATUS_ERROR;
 }
-

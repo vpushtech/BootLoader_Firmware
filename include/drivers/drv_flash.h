@@ -10,11 +10,12 @@
 #ifndef BL_FLASH_H_
 #define BL_FLASH_H_
 
-#include "stdint.h"
-#include "flash_driver.h"
+/*******************************************************************************
+ *  HEADER FILE INCLUDES
+ ******************************************************************************/
 #include "clockMan1.h"
-#include "drv_nvic.h"
 
+/* ==================== TYPE DEFINITIONS ==================== */
 typedef enum {
     FLASH_OK = 0,
     FLASH_ERROR,
@@ -22,8 +23,9 @@ typedef enum {
     FLASH_ERASE_ERROR,
     FLASH_ERROR_UNLOCK,
     FLASH_ERROR_INVALID_ADDRESS,
-} flash_status;
+} DRV_FlashStatus_en;
 
+/* ==================== DEFINES & MACROS ==================== */
 #define PFLASH_START                0x00000000U
 #define PFLASH_SIZE                 (512U * 1024U)
 #define PFLASH_END                  (PFLASH_START + PFLASH_SIZE - 1U)
@@ -42,13 +44,18 @@ typedef enum {
 #define META_SIZE                   (4U * 1024U)
 #define META_END_ADDRESS            (META_START_ADDRESS + META_SIZE - 1U)
 
-flash_status Flash_init(void);
-flash_status Flash_Sector_Erase(uint32_t address, uint32_t size);
-flash_status Flash_App_Erase(void);
-flash_status Flash_Write_Byte(uint32_t address, uint8_t *buffer, uint32_t size);
-flash_status Flash_Read(uint32_t address, uint8_t *buffer, uint32_t size);
-
+/* ==================== INITIALIZATION/CONFIGURATION ==================== */
+DRV_FlashStatus_en DRV_FLASH_Init_gen(void);
 void CCIF_Handler(void);
-void CCIF_Callback(void);
+
+/* ==================== ERASE & OPERATIONS ==================== */
+DRV_FlashStatus_en DRV_FLASH_SectorErase_gen(uint32_t address_argu32, uint32_t size_argu32);
+
+/* ==================== WRITE & OPERATIONS ==================== */
+DRV_FlashStatus_en DRV_FLASH_Write_gen(uint32_t address_argu32, uint8_t *data_argptru8, uint32_t size_argu32);
+
+/* ==================== READ & OPERATIONS ==================== */
+DRV_FlashStatus_en DRV_FLASH_Read_gen(uint32_t address_argu32, uint8_t *data_argptru8, uint32_t size_argu32);
+
 
 #endif /* BL_FLASH_H_ */
