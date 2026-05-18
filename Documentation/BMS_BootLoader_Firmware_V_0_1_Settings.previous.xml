@@ -47,19 +47,6 @@
       <EmptySection_DummyValue />
     </Events>
   </Bean>
-  <Bean name="intMan1" type="interrupt_manager">
-    <Enabled v="Y" />
-    <Properties>
-      <Component_name v="intMan1" />
-      <Component_version v="S32K144_SDK01" />
-    </Properties>
-    <Methods>
-      <EmptySection_DummyValue />
-    </Methods>
-    <Events>
-      <EmptySection_DummyValue />
-    </Events>
-  </Bean>
   <Bean name="dmaController1" type="edma">
     <Enabled v="Y" />
     <Properties>
@@ -140,10 +127,10 @@
       <EmptySection_DummyValue />
     </Events>
   </Bean>
-  <Bean name="Flash" type="flash">
+  <Bean name="Flash1_InitConfig0" type="flash">
     <Enabled v="Y" />
     <Properties>
-      <Component_name v="Flash" />
+      <Component_name v="Flash1_InitConfig0" />
       <Device v="FTFC" />
       <Component_version v="S32K144_SDK01" />
     </Properties>
@@ -159,6 +146,19 @@
     <Properties>
       <Component_name v="lpuart1" />
       <Device v="LPUART1" />
+      <Component_version v="S32K144_SDK01" />
+    </Properties>
+    <Methods>
+      <EmptySection_DummyValue />
+    </Methods>
+    <Events>
+      <EmptySection_DummyValue />
+    </Events>
+  </Bean>
+  <Bean name="intMan1" type="interrupt_manager">
+    <Enabled v="Y" />
+    <Properties>
+      <Component_name v="intMan1" />
       <Component_version v="S32K144_SDK01" />
     </Properties>
     <Methods>

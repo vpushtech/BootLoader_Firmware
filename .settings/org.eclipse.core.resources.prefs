@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
-encoding//Sources/board_config/bsp.c=UTF-8
+encoding//Sources/board_config/bsp_config.c=UTF-8
+encoding//Sources/bootloader/ota_bootloader.c=UTF-8
+encoding//include/board_config/bsp_config.h=UTF-8

@@ -1,91 +1,200 @@
 /*
- * common.c
+ ******************************************************************************
+ * @file         common.c
+ * @brief        Common Utility Functions Implementation
+ * @author       Rushikesh
+ * @date         03-Sep-2025
+ * @version      2.0
  *
- *  Created on: 03-Sep-2025
- *      Author: RushikeshNitinKamble
+ * Modification History:
+ * Date        Author      Description
+ * ----------------------------------------------------------------------------
+ * 03-Sep-2025 RUSHIKESH   Common Utility Functions Implementation
+ * 29-Jan-2026 RUSHIKESH   Added validation, status tracking, and error handling
+ * 01-May-2026 RUSHIKESH   Applied MISRA C:2012 compliance
+ ******************************************************************************
  */
 
+/* ==================== INCLUDE FILES ==================== */
 #include "common_types.h"
 
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : Common_Memcpy_gv
-*   Description   : Copies a specified number of bytes from source to destination
-*   Parameters    : dest_argptrmv - Pointer to destination memory location
-*                   src_argptrmv  - Pointer to source memory location
-*                   size_argstr   - Number of bytes to copy
-*   Return Value  : void* - Pointer to destination memory location
-*   Note          : Returns destination pointer if source/destination is NULL or size is zero
-*  --------------------------------------------------------------------------- */
-void *Common_Memcpy_gv(void *dest_argptrmv, const void *src_argptrmv, size_t size_argstr)
+/* ==================== GLOBAL VARIABLES ==================== */
+BIN APP_Set_Flag[APP_TOTAL_FLAGS] =
 {
-    if (dest_argptrmv == NULL || src_argptrmv == NULL || size_argstr == 0)
-    {
-        return dest_argptrmv;
-    }
-    U8 *dest_argptr_u8 = (uint8_t *)dest_argptrmv;
-    const U8 *src_ptru8 = (const U8 *)src_argptrmv;
-    for (size_t i = 0; i < size_argstr; i++) {
-        dest_argptr_u8[i] = src_ptru8[i];
-    }
-    return dest_argptrmv;
-}
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false,
+    (BIN)false
+};
+
+/* ==================== FUNCTION DEFINITIONS ==================== */
 
 /* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : Common_Memcmp_gi32
-*   Description   : Compares two memory blocks for specified number of bytes
-*   Parameters    : ptr1_argptrmv - Pointer to first memory block
-*                   ptr2_argptrmv - Pointer to second memory block
-*                   size_argst    - Number of bytes to compare
-*   Return Value  : I32 - 0 if equal, positive if ptr1 > ptr2, negative if ptr1 < ptr2
-*   Note          : Returns 0 if either pointer is NULL or size is zero
-*  --------------------------------------------------------------------------- */
-I32 Common_Memcmp_gi32(const void *ptr1_argptrmv, const void *ptr2_argptrmv, size_t size_argst)
+ *  Function   : Common_Memcpy_gst
+ *  Description: Copies size_argstr bytes from src_argptrmv to dest_argptrmv.
+ *               Handles overlapping regions by copying in reverse order.
+ *  Parameters : dest_argptrmv – non-NULL destination pointer
+ *               src_argptrmv  – non-NULL source pointer
+ *               size_argstr   – number of bytes to copy (must be > 0)
+ *  Returns    : COMMON_STATUS_OK on success; error code otherwise
+ * ---------------------------------------------------------------------------*/
+COMMON_Status_ten Common_Memcpy_gst(void * dest_argptrmv,
+                                     const void * src_argptrmv,
+                                     size_t size_argstr)
 {
-    if (ptr1_argptrmv == NULL || ptr2_argptrmv == NULL || size_argst == 0)
+    COMMON_Status_ten retStatus_en;
+    if (dest_argptrmv == NULL)
     {
-        return 0;
+        retStatus_en = COMMON_STATUS_NULL_POINTER;
     }
+    else if (src_argptrmv == NULL)
+    {
+        retStatus_en = COMMON_STATUS_NULL_POINTER;
+    }
+    else if (size_argstr == (size_t)0U)
+    {
+        retStatus_en = COMMON_STATUS_INVALID_SIZE;
+    }
+    else if (dest_argptrmv == src_argptrmv)
+    {
+        retStatus_en = COMMON_STATUS_OK;
+    }
+    else
+    {
 
-    const U8 *ptr1_mu8 = (const U8 *)ptr1_argptrmv;
-    const U8 *ptr2_mu8 = (const U8 *)ptr2_argptrmv;
-
-    for (size_t i = 0; i < size_argst; i++) {
-        if (ptr1_mu8[i] != ptr2_mu8[i])
+        U8 * const       destByte_pu8 = (U8 *)dest_argptrmv;
+        const U8 * const srcByte_pu8  = (const U8 *)src_argptrmv;
+        if ((destByte_pu8 > srcByte_pu8) &&
+            (destByte_pu8 < (srcByte_pu8 + size_argstr)))
         {
-            return (I32)(ptr1_mu8[i] - ptr2_mu8[i]);
+            size_t idx_str = size_argstr;
+            while (idx_str > (size_t)0U)
+            {
+                idx_str--;
+                destByte_pu8[idx_str] = srcByte_pu8[idx_str];
+            }
         }
+        else
+        {
+            size_t idx_str;
+            for (idx_str = (size_t)0U; idx_str < size_argstr; idx_str++)
+            {
+                destByte_pu8[idx_str] = srcByte_pu8[idx_str];
+            }
+        }
+
+        retStatus_en = COMMON_STATUS_OK;
     }
-    return 0;
+
+    return retStatus_en;
 }
 
 /* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : Common_Memset_gv
-*   Description   : Fills a memory block with specified byte value
-*   Parameters    : ptr_argptrv   - Pointer to memory block to fill
-*                   value_argu8   - Value to set each byte to
-*                   size_argst    - Number of bytes to set
-*   Return Value  : void* - Pointer to filled memory block
-*   Note          : Returns original pointer if pointer is NULL or size is zero
-*  --------------------------------------------------------------------------- */
-void *Common_Memset_gv(void *ptr_argptrv, U8 value_argu8, size_t size_argst)
+ *  Function   : Common_Memset_gst
+ *  Description: Fills size_argst bytes starting at ptr_argptrv with value_argu8.
+ *  Parameters : ptr_argptrv  – non-NULL pointer to memory block
+ *               value_argu8  – byte value to write
+ *               size_argst   – number of bytes to set (must be > 0)
+ *  Returns    : COMMON_STATUS_OK on success; error code otherwise
+ * ---------------------------------------------------------------------------*/
+COMMON_Status_ten Common_Memset_gst(void * ptr_argptrv,
+                                     U8 value_argu8,
+                                     size_t size_argst)
 {
-    if (ptr_argptrv == NULL || size_argst == 0)
+    COMMON_Status_ten retStatus_en;
+    if (ptr_argptrv == NULL)
     {
-        return ptr_argptrv;
+        retStatus_en = COMMON_STATUS_NULL_POINTER;
     }
-    U8 *ptr_u8 = (U8 *)ptr_argptrv;
-    U8 byte_value_u8 = (U8)value_argu8;
+    else if (size_argst == (size_t)0U)
+    {
+        retStatus_en = COMMON_STATUS_INVALID_SIZE;
+    }
+    else
+    {
+        U8 * const ptr_pu8 = (U8 *)ptr_argptrv;
+        size_t     idx_str;
 
-    for (size_t i = 0; i < size_argst; i++)
-    {
-        ptr_u8[i] = byte_value_u8;
+        for (idx_str = (size_t)0U; idx_str < size_argst; idx_str++)
+        {
+            ptr_pu8[idx_str] = value_argu8;
+        }
+
+        retStatus_en = COMMON_STATUS_OK;
     }
-    return ptr_argptrv;
+
+    return retStatus_en;
 }
 
+/* -----------------------------------------------------------------------------
+ *  Function   : APP_SetFlag_gst
+ *  Description: Sets the flag at index Set_Idx_argu8 to true.
+ *  Parameters : Set_Idx_argu8 – flag index (must be < APP_TOTAL_FLAGS)
+ *  Returns    : COMMON_STATUS_OK on success; COMMON_STATUS_INVALID_INDEX otherwise
+ * ---------------------------------------------------------------------------*/
+COMMON_Status_ten APP_SetFlag_gst(U8 Set_Idx_argu8)
+{
+    COMMON_Status_ten retStatus_en;
+    if (Set_Idx_argu8 >= (U8)APP_TOTAL_FLAGS)
+    {
+        retStatus_en = COMMON_STATUS_INVALID_INDEX;
+    }
+    else
+    {
+        APP_Set_Flag[Set_Idx_argu8] = (BIN)true;
+        retStatus_en = COMMON_STATUS_OK;
+    }
+
+    return retStatus_en;
+}
+
+/* -----------------------------------------------------------------------------
+ *  Function   : APP_ResetFlag_gst
+ *  Description: Resets the flag at index Reset_Idx_argu8 to false.
+ *  Parameters : Reset_Idx_argu8 – flag index (must be < APP_TOTAL_FLAGS)
+ *  Returns    : COMMON_STATUS_OK on success; COMMON_STATUS_INVALID_INDEX otherwise
+ * ---------------------------------------------------------------------------*/
+COMMON_Status_ten APP_ResetFlag_gst(U8 Reset_Idx_argu8)
+{
+    COMMON_Status_ten retStatus_en;
+
+    if (Reset_Idx_argu8 >= (U8)APP_TOTAL_FLAGS)
+    {
+        retStatus_en = COMMON_STATUS_INVALID_INDEX;
+    }
+    else
+    {
+        APP_Set_Flag[Reset_Idx_argu8] = (BIN)false;
+        retStatus_en = COMMON_STATUS_OK;
+    }
+
+    return retStatus_en;
+}
+
+/* -----------------------------------------------------------------------------
+ *  Function   : APP_GetFlag_gv
+ *  Description: Returns the current state of the flag at index Get_Idx_argu8.
+ *  Parameters : Get_Idx_argu8 – flag index (must be < APP_TOTAL_FLAGS)
+ *  Returns    : BIN – true if flag set; false if clear or index invalid
+ * ---------------------------------------------------------------------------*/
+BIN APP_GetFlag_gv(U8 Get_Idx_argu8)
+{
+    BIN retFlag_b;
+
+    if (Get_Idx_argu8 >= (U8)APP_TOTAL_FLAGS)
+    {
+        retFlag_b = (BIN)false;
+    }
+    else
+    {
+        retFlag_b = APP_Set_Flag[Get_Idx_argu8];
+    }
+
+    return retFlag_b;
+}

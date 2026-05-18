@@ -1,42 +1,87 @@
-#ifndef PERIPH_DRV_DRV_UART_H_
-#define PERIPH_DRV_DRV_UART_H_
-
 /*******************************************************************************
- *  HEADER FILE INCLUDES
- ******************************************************************************/
-#include "status.h"
-#include <stdint.h>
-#include <stdbool.h>
+ *  Description     : UART Driver Header
+ *  Author          : Rushikesh
+ *  Created On      : 08-Jul-2025
+ *  Version         : 2.0
+ *  Modification History:
+ *  Date        Author      Description
+ *  ----------------------------------------------------------------------------
+ *  18-Jul-2025 RUSHIKESH   UART Driver Architecture Implementation
+ *  31-Jul-2025 RUSHIKESH   UART Driver Testing completed
+ *  11-Aug-2025 RUSHIKESH   Naming Architecture Implementation
+ *  26-Jan-2026 RUSHIKESH   Added validation, init tracking, error handling
+ *  01-May-2026 RUSHIKESH   MISRA C 2012 Compliance
+ */
+
+#ifndef DRV_UART_H
+#define DRV_UART_H
+
+/* ==================== INCLUDE FILES ==================== */
+#include "common_types.h"
+#include "lpuart_driver.h"
+#include "lpuart1.h"
+#include "drv_nvic.h"
+
+/* ==================== MACROS ==================== */
+#define DRV_UART_TIMEOUT_MS            (100U)
+#define DRV_UART_DEFAULT_IRQ_PRIORITY  (3U)
+#define DRV_UART_MAX_DATA_SIZE         (1024U)
 
 /* ==================== TYPE DEFINITIONS ==================== */
 typedef enum
 {
-    DRV_UART_INSTANCE_1 = 0,
-    DRV_UART_MAX_INSTANCE
-} DRV_UART_Instance_ten;
-
+    DRV_UART_INSTANCE_0   = 0,
+    DRV_UART_INSTANCE_1   = 1,
+    DRV_MAX_UART_INSTANCE = 2
+} DRV_uartInstance_ten;
 typedef enum
 {
-	DRV_UART_STATUS_SUCCESS = 0,
-	DRV_UART_STATUS_ERROR,
-	DRV_UART_STATUS_BUSY,
-	DRV_UART_STATUS_TIMEOUT
-} DRV_Uart_Status_ten;
+    DRV_UART_SUCCESS               = 0,
+    DRV_UART_FAILED                = 1,
+    DRV_UART_BUSY                  = 2,
+    DRV_UART_TIMEOUT               = 3,
+    DRV_UART_INVALID_INSTANCE      = 4,
+    DRV_UART_INVALID_DATA_SIZE     = 5,
+    DRV_UART_NULL_POINTER          = 6,
+    DRV_UART_NOT_INITIALIZED       = 7,
+    DRV_UART_INTERRUPT_NOT_ENABLED = 8,
+    DRV_UART_ALREADY_INITIALIZED   = 9,
+    DRV_UART_INIT_STATUS           = 10
+} DRV_uartStatus_ten;
 
+/* ==================== GLOBAL VARIABLE DECLARATIONS ==================== */
+extern volatile BIN DRV_uartInitStatus_mb[DRV_MAX_UART_INSTANCE];
 
 /* ==================== FUNCTION PROTOTYPES ==================== */
+extern DRV_uartStatus_ten DRV_UART_Init_gen(U8 uartPinIdx_argu8);
+extern DRV_uartStatus_ten DRV_UART_DeInit_gen(U8 uartPinIdx_argu8);
+extern DRV_uartStatus_ten DRV_UART_WriteBlock_gen(
+    U8        uartPinIdx_argu8,
+    const U8 *data_argptru8,
+    U32       size_argu32);
 
-/* ==================== INITIALIZATION/CONFIGURATION ==================== */
-DRV_Uart_Status_ten DRV_UART_Init(DRV_UART_Instance_ten uartPinIdx_argu8);
-DRV_Uart_Status_ten DRV_UART_Deinit(DRV_UART_Instance_ten uartPinIdx_argu8);
+extern DRV_uartStatus_ten DRV_UART_ReadBlock_gen(
+    U8  uartPinIdx_argu8,
+    U8 *data_argptru8,
+    U32 size_argu32);
 
-/* ==================== TRANSMIT & OPERATIONS ==================== */
-DRV_Uart_Status_ten DRV_UART_SendDataBlocking(DRV_UART_Instance_ten uartPinIdx_argu8,const uint8_t *data_argptru8,uint32_t size_argu32);
-DRV_Uart_Status_ten DRV_UART_SendData(DRV_UART_Instance_ten uartPinIdx_argu8,const uint8_t *data_argptru8,uint32_t size_argu32);
-DRV_Uart_Status_ten DRV_UART_SetRxBuffer(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *rxBuffer,uint32_t size_argu32);
+extern DRV_uartStatus_ten DRV_UART_ReadNonBlock_gen(
+    U8  uartPinIdx_argu8,
+    U8 *data_argptru8,
+    U32 size_argu32);
 
-/* ==================== RECEIVE & OPERATIONS ==================== */
-DRV_Uart_Status_ten DRV_UART_ReceiveDataBlocking(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *data_argptru8,uint32_t size_argu32);
-DRV_Uart_Status_ten DRV_UART_ReceiveData(DRV_UART_Instance_ten uartPinIdx_argu8,uint8_t *data_argptru8,uint32_t size_argu32);
+extern DRV_uartStatus_ten DRV_UART_SetRxBuffer_gen(
+    U8  uartPinIdx_argu8,
+    U8 *data_argptru8,
+    U32 size_argu32);
+extern void uart_callback0_gv(
+    void          *driverState_argp,
+    uart_event_t   event_arg,
+    void          *userData_argp);
 
-#endif /* PERIPH_DRV_DRV_UART_H_ */
+extern void uart_callback1_gv(
+    void          *driverState_argp,
+    uart_event_t   event_arg,
+    void          *userData_argp);
+
+#endif /* DRV_UART_H */
