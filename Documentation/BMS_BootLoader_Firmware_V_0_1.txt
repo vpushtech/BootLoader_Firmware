@@ -182,50 +182,50 @@ Module "wdg_pal1"  (component wdg_pal)
    - wdg_pal1_WDG_GetCounter -Gets the value of the WDG PAL counter. This function gets counter of WDG PAL module.
    - wdg_pal1_WDG_ClearIntFlag -This function clears the Timeout Interrupt Flag.
 
-Module "Flash"     (component flash)
-   - Flash_FLASH_DRV_Init -Flash initialization.
-   - Flash_FLASH_DRV_GetPFlashProtection -P-Flash get protection.
-   - Flash_FLASH_DRV_SetPFlashProtection -P-Flash set protection.
-   - Flash_FLASH_DRV_GetSecurityState -Flash get security state.
-   - Flash_FLASH_DRV_SecurityBypass -Flash security bypass.
-   - Flash_FLASH_DRV_EraseAllBlock -Flash erase all Blocks.
-   - Flash_FLASH_DRV_VerifyAllBlock -Flash verify all Blocks.
-   - Flash_FLASH_DRV_EraseSector -Flash erase sector.
-   - Flash_FLASH_DRV_VerifySection -Flash verify sector.
-   - Flash_FLASH_DRV_EraseSuspend -Flash erase suspend.
-   - Flash_FLASH_DRV_EraseResume -Flash erase resume.
-   - Flash_FLASH_DRV_ReadOnce -Flash read once.
-   - Flash_FLASH_DRV_ProgramOnce -Flash program once.
-   - Flash_FLASH_DRV_Program -Flash program.
-   - Flash_FLASH_DRV_ProgramCheck -Flash program check.
-   - Flash_FLASH_DRV_CheckSum -Calculate check sum.
-   - Flash_FLASH_DRV_ProgramSection -Flash program section.
-   - Flash_FLASH_DRV_EraseBlock -Flash erase block.
-   - Flash_FLASH_DRV_VerifyBlock -Flash verify block.
-   - Flash_FLASH_DRV_GetEERAMProtection -EERAM get protection.
-   - Flash_FLASH_DRV_SetEERAMProtection -EERAM set protection.
-   - Flash_FLASH_DRV_SetFlexRamFunction -Flash Set FlexRam function command.
-   - Flash_FLASH_DRV_EEEWrite -EEPROM Emulator Write.
-   - Flash_FLASH_DRV_DEFlashPartition -Flash D/E-Flash Partition.
-   - Flash_FLASH_DRV_GetDFlashProtection -D-Flash get protection.
-   - Flash_FLASH_DRV_SetDFlashProtection -D-Flash set protection.
-   - Flash_FLASH_DRV_PFlashSwap -swap between the two half of total logical P-Flash memory blocks within the memory map
-   - Flash_FLASH_DRV_PFlashSwapCtl -implements swap control command corresponding with swap control code provided via swapcmd 
+Module "Flash1"    (component flash)
+   - Flash1_FLASH_DRV_Init -Flash initialization.
+   - Flash1_FLASH_DRV_GetPFlashProtection -P-Flash get protection.
+   - Flash1_FLASH_DRV_SetPFlashProtection -P-Flash set protection.
+   - Flash1_FLASH_DRV_GetSecurityState -Flash get security state.
+   - Flash1_FLASH_DRV_SecurityBypass -Flash security bypass.
+   - Flash1_FLASH_DRV_EraseAllBlock -Flash erase all Blocks.
+   - Flash1_FLASH_DRV_VerifyAllBlock -Flash verify all Blocks.
+   - Flash1_FLASH_DRV_EraseSector -Flash erase sector.
+   - Flash1_FLASH_DRV_VerifySection -Flash verify sector.
+   - Flash1_FLASH_DRV_EraseSuspend -Flash erase suspend.
+   - Flash1_FLASH_DRV_EraseResume -Flash erase resume.
+   - Flash1_FLASH_DRV_ReadOnce -Flash read once.
+   - Flash1_FLASH_DRV_ProgramOnce -Flash program once.
+   - Flash1_FLASH_DRV_Program -Flash program.
+   - Flash1_FLASH_DRV_ProgramCheck -Flash program check.
+   - Flash1_FLASH_DRV_CheckSum -Calculate check sum.
+   - Flash1_FLASH_DRV_ProgramSection -Flash program section.
+   - Flash1_FLASH_DRV_EraseBlock -Flash erase block.
+   - Flash1_FLASH_DRV_VerifyBlock -Flash verify block.
+   - Flash1_FLASH_DRV_GetEERAMProtection -EERAM get protection.
+   - Flash1_FLASH_DRV_SetEERAMProtection -EERAM set protection.
+   - Flash1_FLASH_DRV_SetFlexRamFunction -Flash Set FlexRam function command.
+   - Flash1_FLASH_DRV_EEEWrite -EEPROM Emulator Write.
+   - Flash1_FLASH_DRV_DEFlashPartition -Flash D/E-Flash Partition.
+   - Flash1_FLASH_DRV_GetDFlashProtection -D-Flash get protection.
+   - Flash1_FLASH_DRV_SetDFlashProtection -D-Flash set protection.
+   - Flash1_FLASH_DRV_PFlashSwap -swap between the two half of total logical P-Flash memory blocks within the memory map
+   - Flash1_FLASH_DRV_PFlashSwapCtl -implements swap control command corresponding with swap control code provided via swapcmd 
                 parameter
-   - Flash_FLASH_DRV_EraseAllBlockUnsecure -Flash erase all Blocks.
-   - Flash_FLASH_DRV_EnableCmdCompleteInterupt -Enable the command complete interrupt.
-   - Flash_FLASH_DRV_DisableCmdCompleteInterupt -Disable the command complete interrupt.
-   - Flash_FLASH_DRV_GetCmdCompleteFlag -Check the command complete flag has completed or not.
-   - Flash_FLASH_DRV_EnableReadColisionInterupt -Enable the read collision error interrupt.
-   - Flash_FLASH_DRV_DisableReadColisionInterupt -Disable the read collision error interrupt.
-   - Flash_FLASH_DRV_GetReadColisionFlag -Check the read collision error flag is detected or not.
-   - Flash_FLASH_DRV_ClearReadColisionFlag -Clear the read collision error flag.
-   - Flash_FLASH_DRV_EnableDoubleBitFaultInterupt -Enable the double bit fault detect interrupt.
-   - Flash_FLASH_DRV_DisableDoubleBitFaultInterupt -Disable the double bit fault detect interrupt.
-   - Flash_FLASH_DRV_GetDoubleBitFaultFlag -Check the double bit fault flag is detected or not.
-   - Flash_FLASH_DRV_ClearDoubleBitFaultFlag -Clear the double bit fault detect flag.
-   - Flash_FLASH_DRV_ForceDoubleBitFaultDetectCmd -Force Double Bit Fault Detect.
-   - Flash_FLASH_DRV_GetDefaultConfig -Get default flash user configuration.
+   - Flash1_FLASH_DRV_EraseAllBlockUnsecure -Flash erase all Blocks.
+   - Flash1_FLASH_DRV_EnableCmdCompleteInterupt -Enable the command complete interrupt.
+   - Flash1_FLASH_DRV_DisableCmdCompleteInterupt -Disable the command complete interrupt.
+   - Flash1_FLASH_DRV_GetCmdCompleteFlag -Check the command complete flag has completed or not.
+   - Flash1_FLASH_DRV_EnableReadColisionInterupt -Enable the read collision error interrupt.
+   - Flash1_FLASH_DRV_DisableReadColisionInterupt -Disable the read collision error interrupt.
+   - Flash1_FLASH_DRV_GetReadColisionFlag -Check the read collision error flag is detected or not.
+   - Flash1_FLASH_DRV_ClearReadColisionFlag -Clear the read collision error flag.
+   - Flash1_FLASH_DRV_EnableDoubleBitFaultInterupt -Enable the double bit fault detect interrupt.
+   - Flash1_FLASH_DRV_DisableDoubleBitFaultInterupt -Disable the double bit fault detect interrupt.
+   - Flash1_FLASH_DRV_GetDoubleBitFaultFlag -Check the double bit fault flag is detected or not.
+   - Flash1_FLASH_DRV_ClearDoubleBitFaultFlag -Clear the double bit fault detect flag.
+   - Flash1_FLASH_DRV_ForceDoubleBitFaultDetectCmd -Force Double Bit Fault Detect.
+   - Flash1_FLASH_DRV_GetDefaultConfig -Get default flash user configuration.
 
 Module "lpuart1"   (component lpuart)
    - lpuart1_LPUART_DRV_GetDefaultConfig -Initializes the LPUART configuration structure with default values.

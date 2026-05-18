@@ -1,168 +1,296 @@
 /*
+ *****************************************************************************
  * drv_nvic.c
  *
- *  Description     : NVIC Driver
+ *  Description     : NVIC Driver - MISRA C:2012 Compliant
  *  Author          : Rushikesh
  *  Created On      : 15-Jul-2025
- *  Version         : 2.0
+ *  Version         : 3.0
  *  Modification History:
  *  Date        Author      Description
- *  ----------------------------------------------------------------------------
+ *  ---------------------------------------------------------------------------
  *  08-Jul-2025 RUSHIKESH   NVIC Driver Architecture Implementation
- *  31-Jul-2025 RUSHIKESH   NVIC Testing Done with wdg and GPIOs and Timers
- *  11-Aug-2025 RUSHIKESH   Guidelines Followed the naming Architecture Implementation
+ *  31-Jul-2025 RUSHIKESH   NVIC Testing Done with WDG, GPIOs and Timers
+ *  11-Aug-2025 RUSHIKESH   Guidelines Followed Naming Architecture
+ *  29-Jan-2026 RUSHIKESH   Added validation, status tracking, error handling
+ *  01-May-2026 RUSHIKESH   MISRA C:2012 Compliance Applied
  ******************************************************************************/
-
 /* ==================== INCLUDE FILES ==================== */
 #include "drv_nvic.h"
 #include "interrupt_manager.h"
 
-/* ==================== GLOBAL VARIABLES ==================== */
-static const DRV_NVIC_IrqConfig_St DRV_NVIC_IRQ_GlobleTable_arrst[MAX_NVIC_IRQ] = {
-    [NVIC_GPIOA_IRQ] = {PORTA_IRQn},
-    [NVIC_GPIOB_IRQ] = {PORTB_IRQn},
-    [NVIC_GPIOC_IRQ] = {PORTC_IRQn},
-    [NVIC_GPIOD_IRQ] = {PORTD_IRQn},
-    [NVIC_GPIOE_IRQ] = {PORTE_IRQn},
+/* ==================== PRIVATE CONSTANTS ==================== */
+static const DRV_NVIC_IrqConfig_tst DRV_NVIC_IrqTable_arrst[MAX_NVIC_IRQ] =
+{
+    [NVIC_GPIOA_IRQ]          = { PORTA_IRQn              },
+    [NVIC_GPIOB_IRQ]          = { PORTB_IRQn              },
+    [NVIC_GPIOC_IRQ]          = { PORTC_IRQn              },
+    [NVIC_GPIOD_IRQ]          = { PORTD_IRQn              },
+    [NVIC_GPIOE_IRQ]          = { PORTE_IRQn              },
 
-    [NVIC_CAN0_0_15_IRQ] = {CAN0_ORed_0_15_MB_IRQn},
-    [NVIC_CAN0_16_31_IRQ] = {CAN0_ORed_16_31_MB_IRQn},
-    [NVIC_CAN1_0_15_IRQ] = {CAN1_ORed_0_15_MB_IRQn},
-    [NVIC_CAN2_0_15_IRQ] = {CAN2_ORed_0_15_MB_IRQn},
+    [NVIC_CAN0_0_15_IRQ]      = { CAN0_ORed_0_15_MB_IRQn  },
+    [NVIC_CAN0_16_31_IRQ]     = { CAN0_ORed_16_31_MB_IRQn },
+    [NVIC_CAN1_0_15_IRQ]      = { CAN1_ORed_0_15_MB_IRQn  },
+    [NVIC_CAN2_0_15_IRQ]      = { CAN2_ORed_0_15_MB_IRQn  },
 
-    [NVIC_LPIT0_CH0_IRQ] = {LPIT0_Ch0_IRQn},
-    [NVIC_LPIT0_CH1_IRQ] = {LPIT0_Ch1_IRQn},
-    [NVIC_LPIT0_CH2_IRQ] = {LPIT0_Ch2_IRQn},
-    [NVIC_LPIT0_CH3_IRQ] = {LPIT0_Ch3_IRQn},
+    [NVIC_LPIT0_CH0_IRQ]      = { LPIT0_Ch0_IRQn          },
+    [NVIC_LPIT0_CH1_IRQ]      = { LPIT0_Ch1_IRQn          },
+    [NVIC_LPIT0_CH2_IRQ]      = { LPIT0_Ch2_IRQn          },
+    [NVIC_LPIT0_CH3_IRQ]      = { LPIT0_Ch3_IRQn          },
 
-    [NVIC_ADC0_IRQ] = {ADC0_IRQn},
-    [NVIC_ADC1_IRQ] = {ADC1_IRQn},
+    [NVIC_ADC0_IRQ]           = { ADC0_IRQn               },
+    [NVIC_ADC1_IRQ]           = { ADC1_IRQn               },
 
-     [NVIC_FTFC_IRQ]={FTFC_IRQn},
+    [NVIC_FTFC_IRQ]            = { FTFC_IRQn               },
+    [NVIC_FLASH_FAULT_IRQ]    = { FTFC_Fault_IRQn         },
 
-    [NVIC_LPI2C0_MASTER_IRQ] = {LPI2C0_Master_IRQn},
-    [NVIC_LPI2C0_SLAVE_IRQ] = {LPI2C0_Slave_IRQn},
-	[NVIC_FLEXIO_IRQ] ={FLEXIO_IRQn},
-    [NVIC_WDG_IRQ] = {WDOG_EWM_IRQn},
-	 [NVIC_LPUART0_IRQ]={LPUART0_RxTx_IRQn},
-	 [NVIC_LPUART1_IRQ]={LPUART1_RxTx_IRQn},
-	 [NVIC_LPUART2_IRQ]={LPUART2_RxTx_IRQn}
+    [NVIC_LPI2C0_MASTER_IRQ]  = { LPI2C0_Master_IRQn      },
+    [NVIC_LPI2C0_SLAVE_IRQ]   = { LPI2C0_Slave_IRQn       },
+    [NVIC_FLEXIO_IRQ]         = { FLEXIO_IRQn             },
+
+    [NVIC_WDG_IRQ]            = { WDOG_EWM_IRQn           },
+
+    [NVIC_LPUART0_IRQ]        = { LPUART0_RxTx_IRQn       },
+    [NVIC_LPUART1_IRQ]        = { LPUART1_RxTx_IRQn       },
+
+    [NVIC_LPSPI0_IRQ]         = { LPSPI0_IRQn             },
+    [NVIC_LPSPI1_IRQ]         = { LPSPI1_IRQn             },
+    [NVIC_LPSPI2_IRQ]         = { LPSPI2_IRQn             }
 };
 
+/* ==================== PRIVATE STATE ==================== */
+
+static volatile BIN DRV_nvicIrqEnabledStatus_mb[MAX_NVIC_IRQ] = { (BIN)0U };
+
 /* ==================== PRIVATE FUNCTION DECLARATIONS ==================== */
-static DRV_NVIC_Status_En DRV_NVIC_SetPriority_men(DRV_NVIC_Peripheral_IRQ_En IRQIdx_argen, U8 priority_argu8);
+static BIN               DRV_NVIC_IsIdxValid_prv(DRV_NVIC_Irq_ten IRQIdx_argen);
+static BIN               DRV_NVIC_IsPriorityValid_prv(U8 priority_argu8);
+static DRV_NVIC_Status_ten DRV_NVIC_SetPriority_prv(DRV_NVIC_Irq_ten IRQIdx_argen,
+                                                     U8               priority_argu8);
 
-/* ==================== FUNCTION DEFINITIONS ==================== */
+/* ==================== PRIVATE FUNCTIONS ==================== */
 
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_EnableIRQ_gen
-*   Description   : Enables the specified interrupt request
-*   Parameters    : IRQIdx_argen - Interrupt index to enable
-*   Return Value  : DRV_NVIC_Status_En - DRV_NVIC_STATUS_OK if successful, DRV_NVIC_STATUS_ERR if invalid index
-*  --------------------------------------------------------------------------- */
-DRV_NVIC_Status_En DRV_NVIC_EnableIRQ_gen(DRV_NVIC_Peripheral_IRQ_En IRQIdx_argen)
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_IsIdxValid_prv
+ *  Description   : Returns (BIN)1U when IRQIdx_argen is a valid table index.
+ * --------------------------------------------------------------------------- */
+static BIN DRV_NVIC_IsIdxValid_prv(DRV_NVIC_Irq_ten IRQIdx_argen)
 {
-    if (IRQIdx_argen < MAX_NVIC_IRQ) {
-        INT_SYS_EnableIRQ(DRV_NVIC_IRQ_GlobleTable_arrst[IRQIdx_argen].irqNumber);
-        return DRV_NVIC_STATUS_OK;
-    }
-    return DRV_NVIC_STATUS_ERR;
-}
-
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_DisableIRQ_gen
-*   Description   : Disables the specified interrupt request
-*   Parameters    : IRQIdx_argen - Interrupt index to disable
-*   Return Value  : DRV_NVIC_Status_En - DRV_NVIC_STATUS_OK if successful, DRV_NVIC_STATUS_ERR if invalid index
-*  --------------------------------------------------------------------------- */
-DRV_NVIC_Status_En DRV_NVIC_DisableIRQ_gen(DRV_NVIC_Peripheral_IRQ_En IRQIdx_argen)
-{
-    if (IRQIdx_argen < MAX_NVIC_IRQ) {
-        INT_SYS_DisableIRQ(DRV_NVIC_IRQ_GlobleTable_arrst[IRQIdx_argen].irqNumber);
-        return DRV_NVIC_STATUS_OK;
-    }
-    return DRV_NVIC_STATUS_ERR;
-}
-
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_SetPriority_men
-*   Description   : Sets priority level for specified interrupt
-*   Parameters    : IRQIdx_argen - Interrupt index to configure
-*                   priority_argu8 - Priority level (0-255)
-*   Return Value  : DRV_NVIC_Status_En - DRV_NVIC_STATUS_OK if successful, DRV_NVIC_STATUS_ERR if invalid index
-*  --------------------------------------------------------------------------- */
-static DRV_NVIC_Status_En DRV_NVIC_SetPriority_men(DRV_NVIC_Peripheral_IRQ_En IRQIdx_argen, U8 priority_argu8)
-{
-    if (IRQIdx_argen < MAX_NVIC_IRQ) {
-        INT_SYS_SetPriority(DRV_NVIC_IRQ_GlobleTable_arrst[IRQIdx_argen].irqNumber, priority_argu8);
-        return DRV_NVIC_STATUS_OK;
-    }
-    return DRV_NVIC_STATUS_ERR;
-}
-
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_EnableAll_gen
-*   Description   : Enables all available interrupts
-*   Parameters    : None
-*   Return Value  : DRV_NVIC_Status_En - Always returns DRV_NVIC_STATUS_OK
-*  --------------------------------------------------------------------------- */
-DRV_NVIC_Status_En DRV_NVIC_EnableAll_gen(void)
-{
-    for(DRV_NVIC_Peripheral_IRQ_En IRQ_Index = NVIC_GPIOA_IRQ; IRQ_Index < MAX_NVIC_IRQ; IRQ_Index++)
+    BIN result_l;
+    if((U8)IRQIdx_argen < (U8)MAX_NVIC_IRQ)
     {
-        INT_SYS_EnableIRQ(DRV_NVIC_IRQ_GlobleTable_arrst[IRQ_Index].irqNumber);
+        result_l = (BIN)1U;
     }
-    return DRV_NVIC_STATUS_OK;
-}
-
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_DisableAll_gen
-*   Description   : Disables all available interrupts
-*   Parameters    : None
-*   Return Value  : DRV_NVIC_Status_En - Always returns DRV_NVIC_STATUS_OK
-*  --------------------------------------------------------------------------- */
-DRV_NVIC_Status_En DRV_NVIC_DisableAll_gen(void)
-{
-    for(DRV_NVIC_Peripheral_IRQ_En IRQ_Index = NVIC_GPIOA_IRQ; IRQ_Index < MAX_NVIC_IRQ; IRQ_Index++)
+    else
     {
-        INT_SYS_DisableIRQ(DRV_NVIC_IRQ_GlobleTable_arrst[IRQ_Index].irqNumber);
+        result_l = (BIN)0U;
     }
-    return DRV_NVIC_STATUS_OK;
+
+    return result_l;
 }
 
-/* -----------------------------------------------------------------------------
-*  FUNCTION DESCRIPTION
-*  -----------------------------------------------------------------------------
-*   Function Name : DRV_NVIC_IRQConfig_gen
-*   Description   : Configures interrupt with specified priority level
-*   Parameters    : IRQIdx_argen - Interrupt index to configure
-*                   priority_argu8 - Priority level (0-255)
-*   Return Value  : DRV_NVIC_Status_En - DRV_NVIC_STATUS_OK if successful, error status otherwise
-*  --------------------------------------------------------------------------- */
-DRV_NVIC_Status_En DRV_NVIC_IRQConfig_gen(DRV_NVIC_Peripheral_IRQ_En IRQIdx_argen, U8 priority_argu8)
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_IsPriorityValid_prv
+ *  Description   : Returns (BIN)1U when priority_argu8 is within 0..15.
+ * --------------------------------------------------------------------------- */
+static BIN DRV_NVIC_IsPriorityValid_prv(U8 priority_argu8)
 {
-    DRV_NVIC_Status_En Status_En;
+    BIN result_l;
 
-    Status_En = DRV_NVIC_DisableIRQ_gen(IRQIdx_argen);
-    if (Status_En != DRV_NVIC_STATUS_OK) {
-        return Status_En;
+    if(priority_argu8 <= (U8)DRV_NVIC_MAX_PRIORITY)
+    {
+        result_l = (BIN)1U;
+    }
+    else
+    {
+        result_l = (BIN)0U;
     }
 
-    Status_En = DRV_NVIC_SetPriority_men(IRQIdx_argen, priority_argu8);
-    if (Status_En != DRV_NVIC_STATUS_OK) {
-        return Status_En;
+    return result_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_SetPriority_prv
+ *  Description   : Sets the hardware priority for the specified IRQ index.
+ *
+ *  MISRA Notes:
+ *    Rule  2.2 : Removed duplicate index/priority checks that were already
+ *               guaranteed valid by the single call-site (IRQConfig_gen).
+ *               Guards retained here as a defensive layer for direct calls.
+ * --------------------------------------------------------------------------- */
+static DRV_NVIC_Status_ten DRV_NVIC_SetPriority_prv(DRV_NVIC_Irq_ten IRQIdx_argen,
+                                                     U8               priority_argu8)
+{
+    DRV_NVIC_Status_ten status_l = DRV_NVIC_STATUS_OK;
+
+    if((BIN)0U == DRV_NVIC_IsIdxValid_prv(IRQIdx_argen))
+    {
+        status_l = DRV_NVIC_STATUS_INVALID_IRQ_INDEX;
+    }
+    else if((BIN)0U == DRV_NVIC_IsPriorityValid_prv(priority_argu8))
+    {
+        status_l = DRV_NVIC_STATUS_INVALID_PRIORITY;
+    }
+    else
+    {
+        INT_SYS_SetPriority(
+            DRV_NVIC_IrqTable_arrst[IRQIdx_argen].DRV_irqNumber_en,
+            priority_argu8);
     }
 
-    Status_En = DRV_NVIC_EnableIRQ_gen(IRQIdx_argen);
-    return Status_En;
+    return status_l;
+}
+
+/* ==================== PUBLIC FUNCTIONS ==================== */
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_EnableIRQ_gen
+ *  Description   : Enables the specified interrupt and updates the status flag.
+ *
+ * --------------------------------------------------------------------------- */
+DRV_NVIC_Status_ten DRV_NVIC_EnableIRQ_gen(DRV_NVIC_Irq_ten IRQIdx_argen)
+{
+    DRV_NVIC_Status_ten status_l = DRV_NVIC_STATUS_OK;
+
+    if((BIN)0U == DRV_NVIC_IsIdxValid_prv(IRQIdx_argen))
+    {
+        status_l = DRV_NVIC_STATUS_INVALID_IRQ_INDEX;
+    }
+    else
+    {
+        if(1U == INT_SYS_GetActive(
+                     DRV_NVIC_IrqTable_arrst[IRQIdx_argen].DRV_irqNumber_en))
+        {
+            status_l = DRV_NVIC_STATUS_IRQ_ALREADY_ENABLED;
+        }
+        else
+        {
+            INT_SYS_EnableIRQ(
+                DRV_NVIC_IrqTable_arrst[IRQIdx_argen].DRV_irqNumber_en);
+
+            DRV_nvicIrqEnabledStatus_mb[IRQIdx_argen] = (BIN)1U;
+        }
+    }
+
+    return status_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_DisableIRQ_gen
+ *  Description   : Disables the specified interrupt and clears the status flag.
+ * --------------------------------------------------------------------------- */
+DRV_NVIC_Status_ten DRV_NVIC_DisableIRQ_gen(DRV_NVIC_Irq_ten IRQIdx_argen)
+{
+    DRV_NVIC_Status_ten status_l = DRV_NVIC_STATUS_OK;
+
+    if((BIN)0U == DRV_NVIC_IsIdxValid_prv(IRQIdx_argen))
+    {
+        status_l = DRV_NVIC_STATUS_INVALID_IRQ_INDEX;
+    }
+    else
+    {
+        if(0U == INT_SYS_GetActive(
+                     DRV_NVIC_IrqTable_arrst[IRQIdx_argen].DRV_irqNumber_en))
+        {
+            status_l = DRV_NVIC_STATUS_IRQ_ALREADY_DISABLED;
+        }
+        else
+        {
+            INT_SYS_DisableIRQ(
+                DRV_NVIC_IrqTable_arrst[IRQIdx_argen].DRV_irqNumber_en);
+
+            DRV_nvicIrqEnabledStatus_mb[IRQIdx_argen] = (BIN)0U;
+        }
+    }
+
+    return status_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_EnableAll_gen
+ *  Description   : Enables every managed interrupt in sequence.
+ * --------------------------------------------------------------------------- */
+DRV_NVIC_Status_ten DRV_NVIC_EnableAll_gen(void)
+{
+    DRV_NVIC_Status_ten status_l = DRV_NVIC_STATUS_OK;
+    U8                  idx_l;
+    for(idx_l = (U8)NVIC_GPIOA_IRQ;
+        idx_l < (U8)MAX_NVIC_IRQ;
+        idx_l++)
+    {
+        status_l = DRV_NVIC_EnableIRQ_gen((DRV_NVIC_Irq_ten)idx_l);
+        if((DRV_NVIC_STATUS_OK             != status_l) &&
+           (DRV_NVIC_STATUS_IRQ_ALREADY_ENABLED != status_l))
+        {
+            break;
+        }
+        else
+        {
+            status_l = DRV_NVIC_STATUS_OK;
+        }
+    }
+
+    return status_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_DisableAll_gen
+ *  Description   : Disables every managed interrupt in sequence.
+ * --------------------------------------------------------------------------- */
+DRV_NVIC_Status_ten DRV_NVIC_DisableAll_gen(void)
+{
+    DRV_NVIC_Status_ten status_l = DRV_NVIC_STATUS_OK;
+    U8                  idx_l;
+
+    for(idx_l = (U8)NVIC_GPIOA_IRQ;
+        idx_l < (U8)MAX_NVIC_IRQ;
+        idx_l++)
+    {
+        status_l = DRV_NVIC_DisableIRQ_gen((DRV_NVIC_Irq_ten)idx_l);
+
+        if((DRV_NVIC_STATUS_OK                  != status_l) &&
+           (DRV_NVIC_STATUS_IRQ_ALREADY_DISABLED != status_l))
+        {
+            break;
+        }
+        else
+        {
+            status_l = DRV_NVIC_STATUS_OK;
+        }
+    }
+
+    return status_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_IRQConfig_gen
+ *  Description   : Sets interrupt priority then enables the interrupt.
+ * --------------------------------------------------------------------------- */
+DRV_NVIC_Status_ten DRV_NVIC_IRQConfig_gen(DRV_NVIC_Irq_ten IRQIdx_argen,
+                                            U8               priority_argu8)
+{
+    DRV_NVIC_Status_ten status_l;
+    status_l = DRV_NVIC_SetPriority_prv(IRQIdx_argen, priority_argu8);
+
+    if(DRV_NVIC_STATUS_OK == status_l)
+    {
+        status_l = DRV_NVIC_EnableIRQ_gen(IRQIdx_argen);
+    }
+
+    return status_l;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Function Name : DRV_NVIC_IsIRQEnabled_gb
+ *  Description   : Returns the software-tracked enabled state of the IRQ.
+ * --------------------------------------------------------------------------- */
+BIN DRV_NVIC_IsIRQEnabled_gb(DRV_NVIC_Irq_ten IRQIdx_argen)
+{
+    BIN isEnabled_l = (BIN)0U;
+    if((BIN)1U == DRV_NVIC_IsIdxValid_prv(IRQIdx_argen))
+    {
+        isEnabled_l = DRV_nvicIrqEnabledStatus_mb[IRQIdx_argen];
+    }
+
+    return isEnabled_l;
 }

@@ -24,8 +24,8 @@
 
 
 /* Including necessary module. Cpu.h contains other modules needed for compiling.*/
+#include <bsp_config.h>
 #include "Cpu.h"
-#include"bsp.h"
  volatile int exit_code = 0;
 
 

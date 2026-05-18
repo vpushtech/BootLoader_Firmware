@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PEproject>
   <Header>
-    <Name>BMS_BootLoader_Firmware_V_0_1</Name>
+    <Name>BSTAT_48V_60AMPS_16S_BL_2</Name>
     <SavedBy>DELL</SavedBy>
-    <ModificationStamp>224</ModificationStamp>
+    <ModificationStamp>235</ModificationStamp>
     <Date>2025-07-18</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.2.RT7_b1743-0713</PEversion>
@@ -3647,7 +3647,7 @@
         <ItemSymbol>PTC_port_2</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>PTC2</Value>
+        <Value>&lt;Automatic&gt;</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -3660,7 +3660,7 @@
         <ItemSymbol>PTC_port_3</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>PTC3</Value>
+        <Value>&lt;Automatic&gt;</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -7221,8 +7221,8 @@
         <ItemSymbol>PTC3_MUX</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>&lt;Automatic&gt;</Value>
-        <PinFuncPropStateId>&lt;Automatic&gt;</PinFuncPropStateId>
+        <Value>Alternative 3</Value>
+        <PinFuncPropStateId>state_011</PinFuncPropStateId>
       </ItemState>
       <ItemState>
         <ItemSymbol>PTC3_LK</ItemSymbol>
@@ -7289,8 +7289,8 @@
         <ItemSymbol>PTC2_MUX</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>&lt;Automatic&gt;</Value>
-        <PinFuncPropStateId>&lt;Automatic&gt;</PinFuncPropStateId>
+        <Value>Pin disabled (analog)</Value>
+        <PinFuncPropStateId>state_000</PinFuncPropStateId>
       </ItemState>
       <ItemState>
         <ItemSymbol>PTC2_LK</ItemSymbol>
@@ -16153,9 +16153,9 @@
       </ItemState>
       <ItemState>
         <ItemSymbol>PeriphDevice</ItemSymbol>
-        <ReadOnly>false</ReadOnly>
+        <ReadOnly>true</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>CAN0</Value>
+        <Value>SCG</Value>
         <SharedPrphMode>false</SharedPrphMode>
       </ItemState>
       <ItemState>
@@ -16178,7 +16178,7 @@
         <ItemSymbol>ProjectComponentsCountChanged</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>0</Value>
+        <Value>2</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>ModuleName_ADC</ItemSymbol>
@@ -17666,7 +17666,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>1500</Value>
+        <Value>3000</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>
@@ -17790,7 +17790,7 @@
     <Repository>file:/${ProcessorExpert_loc}/../../S32DS/software/S32SDK_S32K1xx_RTM_3.0.0/tools/pex/Repositories/SDK_S32K1xx_15_Repository</Repository>
     <ComponentUUID>com.freescale.processorexpert.ksdk.flash</ComponentUUID>
     <BeanType>flash</BeanType>
-    <Name>Flash</Name>
+    <Name>Flash1</Name>
     <CompNumb>68</CompNumb>
     <CompEnabled>true</CompEnabled>
     <GenCodeMode>ALWAYS_WRITE</GenCodeMode>
@@ -17805,7 +17805,7 @@
         <ItemSymbol>DeviceName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>Flash</Value>
+        <Value>Flash1</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>PrphDevice</ItemSymbol>
@@ -17859,7 +17859,7 @@
         <ItemSymbol>ConfigName0</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>Flash_InitConfig0</Value>
+        <Value>Flash1_InitConfig0</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>PFlashBlockBase0</ItemSymbol>
