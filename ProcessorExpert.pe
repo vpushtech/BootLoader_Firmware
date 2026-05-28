@@ -3,7 +3,7 @@
   <Header>
     <Name>BSTAT_48V_60AMPS_16S_BL_2</Name>
     <SavedBy>DELL</SavedBy>
-    <ModificationStamp>236</ModificationStamp>
+    <ModificationStamp>237</ModificationStamp>
     <Date>2025-07-18</Date>
     <IDE>Eclipse IDE</IDE>
     <PEversion>1.12.2.RT7_b1743-0713</PEversion>
@@ -16178,7 +16178,7 @@
         <ItemSymbol>ProjectComponentsCountChanged</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>2</Value>
+        <Value>1</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>ModuleName_ADC</ItemSymbol>
@@ -17666,7 +17666,7 @@
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <PropertyModelIsAutomatic>false</PropertyModelIsAutomatic>
-        <Value>3000</Value>
+        <Value>10000</Value>
         <Base>DEC</Base>
       </ItemState>
       <ItemState>

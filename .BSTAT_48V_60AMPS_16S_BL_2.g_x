@@ -53,8 +53,8 @@
       <File Name="SDK/platform/devices/callbacks.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454632" FileType="1048576" CompNumb="1" />
       <File Name="SDK/platform/drivers/inc/flash_driver.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454482" FileType="1048576" CompNumb="68" />
       <File Name="SDK/rtos/osif/osif_baremetal.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454010" FileType="1048576" CompNumb="27" />
-      <File Name="SDK/platform/drivers/inc/flexcan_driver.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454370" FileType="1048576" CompNumb="64" />
       <File Name="Generated_Code/Cpu.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454837" FileType="45637" CompNumb="1" />
+      <File Name="SDK/platform/drivers/inc/flexcan_driver.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454370" FileType="1048576" CompNumb="64" />
       <File Name="SDK/platform/drivers/src/clock/S32K1xx/clock_S32K1xx.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453825" FileType="1048576" CompNumb="61" />
       <File Name="Documentation/BSTAT_48V_60AMPS_16S_BL_2.txt" FileDate="2026-05-14, 14:50:54" FileAge="1778750454969" FileType="3072" />
       <File Name="SDK/platform/drivers/inc/edma_driver.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454126" FileType="1048576" CompNumb="30" />
@@ -63,8 +63,8 @@
       <File Name="Generated_Code/Cpu.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454837" FileType="45637" CompNumb="1" />
       <File Name="SDK/platform/drivers/src/lpuart/lpuart_irq.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454565" FileType="1048576" CompNumb="69" />
       <File Name="SDK/platform/drivers/src/lpit/lpit_driver.c" FileDate="2026-05-14, 14:50:53" FileAge="1778750453941" FileType="1048576" CompNumb="5" />
-      <File Name="SDK/platform/drivers/inc/interrupt_manager.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453778" FileType="1048576" CompNumb="70" />
       <File Name="Generated_Code/dmaController1.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454888" FileType="45637" CompNumb="30" />
+      <File Name="SDK/platform/drivers/inc/interrupt_manager.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453778" FileType="1048576" CompNumb="70" />
       <File Name="SDK/platform/drivers/src/lpuart/lpuart_irq.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454561" FileType="1048576" CompNumb="69" />
       <File Name="SDK/platform/drivers/src/flexcan/flexcan_driver.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454311" FileType="1048576" CompNumb="64" />
       <File Name="SDK/platform/devices/S32K144/include/S32K144_features.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454729" FileType="1048576" CompNumb="1" />
@@ -92,18 +92,18 @@
       <File Name="SDK/platform/drivers/inc/lpit_driver.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453979" FileType="1048576" CompNumb="5" />
       <File Name="Generated_Code/lpit1.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454896" FileType="45637" CompNumb="5" />
       <File Name="Generated_Code/wdg_pal1.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454868" FileType="45637" CompNumb="65" />
-      <File Name="Generated_Code/wdg_pal1.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454868" FileType="45637" CompNumb="65" />
-      <File Name="Documentation/BSTAT_48V_60AMPS_16S_BL_2_Settings.xml" FileDate="2026-05-14, 14:50:54" FileAge="1778750454939" FileType="3072" />
+      <File Name="Generated_Code/wdg_pal1.c" FileDate="2026-05-22, 17:43:01" FileAge="1779451981415" FileType="45637" CompNumb="65" />
       <File Name="SDK/platform/drivers/src/clock/S32K1xx/pmc_hw_access.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453840" FileType="1048576" CompNumb="61" />
+      <File Name="Documentation/BSTAT_48V_60AMPS_16S_BL_2_Settings.xml" FileDate="2026-05-14, 14:50:54" FileAge="1778750454939" FileType="3072" />
       <File Name="SDK/platform/drivers/src/edma/edma_hw_access.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454095" FileType="1048576" CompNumb="30" />
       <File Name="SDK/platform/drivers/src/flexcan/flexcan_irq.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454328" FileType="1048576" CompNumb="64" />
       <File Name="SDK/platform/drivers/inc/clock.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453910" FileType="1048576" CompNumb="61" />
-      <File Name="SDK/platform/drivers/src/edma/edma_hw_access.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454057" FileType="1048576" CompNumb="30" />
       <File Name="SDK/platform/drivers/src/clock/S32K1xx/scg_hw_access.h" FileDate="2026-05-14, 14:50:53" FileAge="1778750453863" FileType="1048576" CompNumb="61" />
-      <File Name="SDK/platform/drivers/src/flash/flash_driver.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454464" FileType="1048576" CompNumb="68" />
+      <File Name="SDK/platform/drivers/src/edma/edma_hw_access.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454057" FileType="1048576" CompNumb="30" />
       <File Name="SDK/platform/drivers/src/flexcan/flexcan_irq.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454345" FileType="1048576" CompNumb="64" />
+      <File Name="SDK/platform/drivers/src/flash/flash_driver.c" FileDate="2026-05-14, 14:50:54" FileAge="1778750454464" FileType="1048576" CompNumb="68" />
       <File Name="SDK/platform/drivers/inc/wdog_driver.h" FileDate="2026-05-14, 14:50:54" FileAge="1778750454829" FileType="1048576" CompNumb="1" />
     </GeneratedByPE>
   </GeneratedFilesList>
-  <CodeGenReference>2</CodeGenReference>
+  <CodeGenReference>4</CodeGenReference>
 </CodeGenerationInfo>

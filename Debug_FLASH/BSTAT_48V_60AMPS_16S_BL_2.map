@@ -2062,11 +2062,11 @@ LOAD c:/nxp/s32ds_arm_v2.2/s32ds/build_tools/gcc_v6.3/gcc-6.3-arm32-eabi/bin/../
                 0x00005ae2                OSIF_SemaDestroy
  *fill*         0x00005ae6        0x2 
  .text.BSP_ProcessBootloaderComm_gv
-                0x00005ae8       0xbc ./Sources/board_config/bsp_config.o
+                0x00005ae8       0xb8 ./Sources/board_config/bsp_config.o
                 0x00005ae8                BSP_ProcessBootloaderComm_gv
  .text.BSP_Init
-                0x00005ba4       0xb8 ./Sources/board_config/bsp_config.o
-                0x00005ba4                BSP_Init
+                0x00005ba0       0xbc ./Sources/board_config/bsp_config.o
+                0x00005ba0                BSP_Init
  .text.BSP_ProcessOtaSubCommand_mv
                 0x00005c5c      0x2a4 ./Sources/board_config/bsp_config.o
                 0x00005c5c                BSP_ProcessOtaSubCommand_mv
@@ -2697,7 +2697,7 @@ LOAD c:/nxp/s32ds_arm_v2.2/s32ds/build_tools/gcc_v6.3/gcc-6.3-arm32-eabi/bin/../
                 0x00000001                ASSERT ((__StackLimit >= __HeapLimit), region m_data_2 overflowed with stack and heap)
 OUTPUT(BSTAT_48V_60AMPS_16S_BL_2.elf elf32-littlearm)
 
-.debug_info     0x00000000    0x54632
+.debug_info     0x00000000    0x54633
  .debug_info    0x00000000     0x2289 ./Generated_Code/Flash1.o
  .debug_info    0x00002289     0x2296 ./Generated_Code/canCom1.o
  .debug_info    0x0000451f     0x23bf ./Generated_Code/clockMan1.o
@@ -2732,17 +2732,17 @@ OUTPUT(BSTAT_48V_60AMPS_16S_BL_2.elf elf32-littlearm)
  .debug_info    0x000312c3      0xa9e ./SDK/rtos/osif/osif_baremetal.o
  .debug_info    0x00031d61     0x3dce ./Sources/board_config/bsp_config.o
  .debug_info    0x00035b2f     0x2be4 ./Sources/bootloader/can_bootloader.o
- .debug_info    0x00038713     0x2f8e ./Sources/bootloader/ota_bootloader.o
- .debug_info    0x0003b6a1     0x2955 ./Sources/can_communication/can_communication.o
- .debug_info    0x0003dff6      0x368 ./Sources/drivers/common.o
- .debug_info    0x0003e35e     0x382f ./Sources/drivers/drv_can .o
- .debug_info    0x00041b8d     0x2f92 ./Sources/drivers/drv_flash.o
- .debug_info    0x00044b1f      0x7d5 ./Sources/drivers/drv_nvic.o
- .debug_info    0x000452f4     0x33de ./Sources/drivers/drv_timer.o
- .debug_info    0x000486d2     0x3022 ./Sources/drivers/drv_uart.o
- .debug_info    0x0004b6f4     0x27b1 ./Sources/drivers/drv_wdg.o
- .debug_info    0x0004dea5     0x27e7 ./Sources/main.o
- .debug_info    0x0005068c     0x3fa6 ./Sources/nvm_management/nvm.o
+ .debug_info    0x00038713     0x2f8f ./Sources/bootloader/ota_bootloader.o
+ .debug_info    0x0003b6a2     0x2955 ./Sources/can_communication/can_communication.o
+ .debug_info    0x0003dff7      0x368 ./Sources/drivers/common.o
+ .debug_info    0x0003e35f     0x382f ./Sources/drivers/drv_can .o
+ .debug_info    0x00041b8e     0x2f92 ./Sources/drivers/drv_flash.o
+ .debug_info    0x00044b20      0x7d5 ./Sources/drivers/drv_nvic.o
+ .debug_info    0x000452f5     0x33de ./Sources/drivers/drv_timer.o
+ .debug_info    0x000486d3     0x3022 ./Sources/drivers/drv_uart.o
+ .debug_info    0x0004b6f5     0x27b1 ./Sources/drivers/drv_wdg.o
+ .debug_info    0x0004dea6     0x27e7 ./Sources/main.o
+ .debug_info    0x0005068d     0x3fa6 ./Sources/nvm_management/nvm.o
 
 .debug_abbrev   0x00000000     0x6809
  .debug_abbrev  0x00000000      0x16a ./Generated_Code/Flash1.o

@@ -70,7 +70,7 @@ void OTA_Init_gv(void)
     DRV_UART_Init_gen(OTA_UART_INSTANCE);
 
     /* Configure NVIC interrupt for UART with priority 6 */
-    DRV_NVIC_IRQConfig_gen(NVIC_LPUART1_IRQ, 6);
+    DRV_NVIC_IRQConfig_gen(NVIC_LPUART1_IRQ, 1);
 
     /* Start non-blocking UART read */
     DRV_UART_ReadNonBlock_gen(OTA_UART_INSTANCE, &OTA_UartRxByte_u8, 1U);
@@ -560,6 +560,7 @@ void uart_callback1_gv(void *driverState_argp, uart_event_t event_argin,
 
     if (event_argin == UART_EVENT_RX_FULL)
     {
+
         /* Process received byte */
     	uart_flag_b=true;
         OTA_ProcessRxData_gv(OTA_UartRxByte_u8);
@@ -588,6 +589,7 @@ void uart_callback1_gv(void *driverState_argp, uart_event_t event_argin,
 void uart_callback0_gv(void *driverState_argp, uart_event_t event_argin,
                         void *userData_argp)
 {
+
     (void)driverState_argp;
     (void)event_argin;
     (void)userData_argp;

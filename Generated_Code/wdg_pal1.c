@@ -7,7 +7,7 @@
 **     Version     : Component SDK_S32K1xx_15, Driver 01.00, CPU db: 3.00.000
 **     Repository  : SDK_S32K1xx_15
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2026-05-14, 14:50, # CodeGen: 0
+**     Date/Time   : 2026-05-22, 17:42, # CodeGen: 3
 **
 **     Copyright 1997 - 2015 Freescale Semiconductor, Inc. 
 **     Copyright 2016-2017 NXP 
@@ -64,7 +64,7 @@ const wdg_config_t wdg_pal1_Config0 =
         .stop        = false,
         .debug       = true
     },
-    .timeoutValue    = 3000U,
+    .timeoutValue    = 10000U,
     .percentWindow   = 100U,
     .intEnable       = true,
     .winEnable       = true,

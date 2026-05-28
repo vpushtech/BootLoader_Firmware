@@ -618,7 +618,7 @@ void BSP_Init(void)
     DRV_FLASH_Init_gen();
 
     DRV_CAN_Init_gen(DRV_CAN_INSTANCE_0);
-
+    OTA_Init_gv();
     DRV_Timer_Init_gst(DRV_TIMER0);
     DRV_Timer_StartChannel_gst(DRV_TIMER0,LPTI_TIMER0_CH0);
 
@@ -672,7 +672,7 @@ void BSP_ProcessBootloaderComm_gv(void)
 
 
     BSP_CAN_RxConfig_mv();
-    OTA_Init_gv();
+
     if (NVM_FlshStoredData_st.APP_bootFlag_u16 == 0x5650U)
     {
         BSP_ProcessUartComm_gv();
