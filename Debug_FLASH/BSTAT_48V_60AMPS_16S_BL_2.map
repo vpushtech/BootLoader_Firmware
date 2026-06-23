@@ -1062,7 +1062,7 @@ Discarded input sections
  .text          0x00000000        0x0 ./Sources/board_config/bsp_config.o
  .data          0x00000000        0x0 ./Sources/board_config/bsp_config.o
  .bss           0x00000000        0x0 ./Sources/board_config/bsp_config.o
- .data.dev_board_mux_InitConfigArr
+ .data.custum_board_mux_InitConfigArr
                 0x00000000      0x1e0 ./Sources/board_config/bsp_config.o
  .text          0x00000000        0x0 ./Sources/bootloader/can_bootloader.o
  .data          0x00000000        0x0 ./Sources/bootloader/can_bootloader.o
@@ -2367,9 +2367,9 @@ LOAD c:/nxp/s32ds_arm_v2.2/s32ds/build_tools/gcc_v6.3/gcc-6.3-arm32-eabi/bin/../
  .data.g_lpuartIsr
                 0x1fff85a4        0xc ./SDK/platform/drivers/src/lpuart/lpuart_irq.o
                 0x1fff85a4                g_lpuartIsr
- .data.custum_board_mux_InitConfigArr
+ .data.dev_board_mux_InitConfigArr
                 0x1fff85b0      0x1e0 ./Sources/board_config/bsp_config.o
-                0x1fff85b0                custum_board_mux_InitConfigArr
+                0x1fff85b0                dev_board_mux_InitConfigArr
  .data.s_otaFlashAddr_u32
                 0x1fff8790        0x4 ./Sources/board_config/bsp_config.o
  .data.OTA_Command_en

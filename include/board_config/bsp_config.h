@@ -27,7 +27,7 @@
 #include "S32K144.h"
 
 #ifndef CUSTUM_BOARD_PIN_CONFIG
-#define CUSTUM_BOARD_PIN_CONFIG (1U)
+#define CUSTUM_BOARD_PIN_CONFIG (0U)
 #endif
 /* ==================== ENUMERATIONS ==================== */
 typedef enum
